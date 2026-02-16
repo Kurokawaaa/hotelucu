@@ -1,0 +1,15 @@
+<h2>Tambah Fasilitas</h2>
+
+<%= form_with model: [:admin, @facility] do |f| %>
+  <div>
+    <%= f.label :name, "Nama Fasilitas" %><br>
+    <%= f.text_field :name %>
+  </div>
+
+  <div>
+    <%= f.submit "Simpan" %>
+  </div>
+<% end %>
+
+<br>
+<%= link_to "Kembali", admin_facilities_path %>

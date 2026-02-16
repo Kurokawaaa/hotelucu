@@ -1,0 +1,117 @@
+<% if resource.errors.any? %>
+  <style>
+    .devise-error-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .devise-error-modal__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+    }
+
+    .devise-error-modal__content {
+      position: relative;
+      width: min(520px, 100%);
+      background: #fff;
+      border-radius: 12px;
+      padding: 1rem 1.25rem 1.25rem;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+      animation: deviseErrorFadeUp 0.2s ease-out;
+    }
+
+    .devise-error-modal__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .devise-error-modal__close {
+      border: 0;
+      background: transparent;
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+      color: #666;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .devise-error-modal__title {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #b42318;
+      line-height: 1.35;
+    }
+
+    .devise-error-modal__list {
+      margin: 0;
+      padding-left: 1.25rem;
+      color: #3d3d3d;
+    }
+
+    .devise-error-modal__list li + li {
+      margin-top: 0.35rem;
+    }
+
+    @keyframes deviseErrorFadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+
+  <div id="devise-error-modal" class="devise-error-modal" data-turbo-temporary role="dialog" aria-modal="true" aria-labelledby="devise-error-modal-title">
+    <div class="devise-error-modal__backdrop" data-error-modal-close></div>
+    <div class="devise-error-modal__content">
+      <div class="devise-error-modal__header">
+        <h2 id="devise-error-modal-title" class="devise-error-modal__title">
+          <%= I18n.t("errors.messages.not_saved",
+                     count: resource.errors.count,
+                     resource: resource.class.model_name.human.downcase) %>
+        </h2>
+        <button type="button" class="devise-error-modal__close" data-error-modal-close aria-label="Close">&times;</button>
+      </div>
+      <ul class="devise-error-modal__list">
+        <% resource.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var modal = document.getElementById("devise-error-modal");
+      if (!modal) return;
+
+      function closeModal() {
+        modal.remove();
+        document.removeEventListener("keydown", onKeydown);
+      }
+
+      function onKeydown(event) {
+        if (event.key === "Escape") closeModal();
+      }
+
+      modal.querySelectorAll("[data-error-modal-close]").forEach(function (element) {
+        element.addEventListener("click", closeModal);
+      });
+
+      document.addEventListener("keydown", onKeydown);
+    })();
+  </script>
+<% end %>

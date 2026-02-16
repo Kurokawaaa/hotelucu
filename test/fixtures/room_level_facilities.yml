@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  room_level: one
+  facility: one
+
+two:
+  room_level: two
+  facility: two

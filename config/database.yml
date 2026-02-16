@@ -1,0 +1,38 @@
+# 1. Konfigurasi Dasar untuk SQLite (Laptop)
+default: &default
+  adapter: sqlite3
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  timeout: 5000
+
+# 2. Bagian Development (Ini yang hilang tadi!)
+development:
+  <<: *default
+  database: storage/development.sqlite3
+
+# 3. Bagian Test
+test:
+  <<: *default
+  database: storage/test.sqlite3
+
+# 4. Bagian Production (Untuk AWS)
+production:
+  primary: &prod_db
+    adapter: postgresql
+    encoding: unicode
+    host: <%= ENV["DATABASE_HOST"] || 'localhost' %>
+    database: <%= ENV["DATABASE_NAME"] || 'production_db' %>
+    username: <%= ENV["DATABASE_USERNAME"] || 'postgres' %>
+    password: <%= ENV["DATABASE_PASSWORD"] || '' %>
+    port: 5432
+  cache:
+    <<: *prod_db
+    database: <%= ENV["DATABASE_NAME"] ? "#{ENV['DATABASE_NAME']}_cache" : 'production_cache' %>
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *prod_db
+    database: <%= ENV["DATABASE_NAME"] ? "#{ENV['DATABASE_NAME']}_queue" : 'production_queue' %>
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *prod_db
+    database: <%= ENV["DATABASE_NAME"] ? "#{ENV['DATABASE_NAME']}_cable" : 'production_cable' %>
+    migrations_paths: db/cable_migrate

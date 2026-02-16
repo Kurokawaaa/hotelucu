@@ -1,0 +1,146 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-9 col-xl-8">
+      <div class="card border-0 shadow-lg radius-10 overflow-hidden">
+        <div class="card-header bg-primary text-white py-4">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <h4 class="mb-1">Booking Kamar</h4>
+              <p class="mb-0 opacity-75">Pilih tingkatan kamar dan jumlahnya</p>
+            </div>
+            <div class="text-end">
+              <div class="small opacity-75">Total Pembayaran</div>
+              <div class="h5 mb-0" id="bookingTotal">Rp 0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-4 p-lg-5">
+          <%= form_with model: @booking, url: bookings_path, local: true do |f| %>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded-3 h-100">
+                  <%= f.label :check_in, "Check In", class: "form-label fw-semibold" %>
+                  <%= f.date_field :check_in, class: "form-control form-control-lg", id: "checkIn" %>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-light rounded-3 h-100">
+                  <%= f.label :check_out, "Check Out", class: "form-label fw-semibold" %>
+                  <%= f.date_field :check_out, class: "form-control form-control-lg", id: "checkOut" %>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between mt-5 mb-3">
+              <div>
+                <h6 class="mb-1">Detail Kamar</h6>
+                <small class="text-muted">Tambah lebih dari satu tingkatan jika perlu</small>
+              </div>
+              <button type="button" class="btn btn-outline-primary btn-sm" id="addRoomLevel">
+                Tambah Tingkatan
+              </button>
+            </div>
+
+            <div id="roomLevelRows" class="vstack gap-3">
+              <div class="room-level-row p-3 border rounded-3 bg-white shadow-sm">
+                <div class="row g-3 align-items-end">
+                  <div class="col-md-7">
+                    <label class="form-label fw-semibold">Tingkatan Kamar</label>
+                    <select name="booking[items][][room_level_id]" class="form-select room-level-select">
+                      <option value="">Pilih tingkatan</option>
+                      <% @room_levels.each do |level| %>
+                        <option value="<%= level.id %>" data-price="<%= level.price %>">
+                          <%= level.name %> - Rp <%= number_with_delimiter(level.price) %>/malam
+                        </option>
+                      <% end %>
+                    </select>
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label fw-semibold">Jumlah</label>
+                    <input type="number" name="booking[items][][quantity]" class="form-control room-qty" min="1" value="1">
+                  </div>
+                  <div class="col-md-2 d-grid">
+                    <button type="button" class="btn btn-outline-danger remove-row">Hapus</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert alert-info mt-4 mb-0">
+              Total dihitung dari harga per malam x jumlah kamar x jumlah malam.
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+              <%= f.submit "Booking Sekarang", class: "btn btn-primary btn-lg px-4" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const rowsContainer = document.getElementById("roomLevelRows");
+    const addButton = document.getElementById("addRoomLevel");
+    const totalEl = document.getElementById("bookingTotal");
+    const checkIn = document.getElementById("checkIn");
+    const checkOut = document.getElementById("checkOut");
+
+    const formatRupiah = (value) => {
+      return "Rp " + (value || 0).toLocaleString("id-ID");
+    };
+
+    const nightsBetween = () => {
+      if (!checkIn.value || !checkOut.value) return 1;
+      const inDate = new Date(checkIn.value);
+      const outDate = new Date(checkOut.value);
+      const diff = Math.ceil((outDate - inDate) / (1000 * 60 * 60 * 24));
+      return diff > 0 ? diff : 1;
+    };
+
+    const updateTotal = () => {
+      let total = 0;
+      const nights = nightsBetween();
+
+      rowsContainer.querySelectorAll(".room-level-row").forEach((row) => {
+        const select = row.querySelector(".room-level-select");
+        const qtyInput = row.querySelector(".room-qty");
+        const price = parseInt(select.selectedOptions[0]?.dataset.price || "0", 10);
+        const qty = parseInt(qtyInput.value || "0", 10);
+        total += price * qty * nights;
+      });
+
+      totalEl.textContent = formatRupiah(total);
+    };
+
+    const bindRowEvents = (row) => {
+      row.querySelector(".room-level-select").addEventListener("change", updateTotal);
+      row.querySelector(".room-qty").addEventListener("input", updateTotal);
+      row.querySelector(".remove-row").addEventListener("click", () => {
+        if (rowsContainer.querySelectorAll(".room-level-row").length > 1) {
+          row.remove();
+          updateTotal();
+        }
+      });
+    };
+
+    rowsContainer.querySelectorAll(".room-level-row").forEach(bindRowEvents);
+    checkIn.addEventListener("change", updateTotal);
+    checkOut.addEventListener("change", updateTotal);
+
+    addButton.addEventListener("click", () => {
+      const template = rowsContainer.querySelector(".room-level-row");
+      const clone = template.cloneNode(true);
+      clone.querySelector(".room-level-select").value = "";
+      clone.querySelector(".room-qty").value = 1;
+      rowsContainer.appendChild(clone);
+      bindRowEvents(clone);
+      updateTotal();
+    });
+
+    updateTotal();
+  });
+</script>

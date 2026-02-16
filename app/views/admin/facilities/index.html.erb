@@ -1,0 +1,87 @@
+
+
+<main class="page-content-body-card">
+  <div class="card radius-10">
+    <div class="card-body text-center">
+
+      <h5 class="mb-4">Fasilitas per Tingkatan</h5>
+
+      <!-- PILIH TINGKATAN -->
+      <%= form_with url: admin_facilities_path, method: :get, local: true do %>
+        <div class="mb-3">
+          <label class="form-label">Pilih Tingkatan (Tier)</label>
+          <select name="room_level_id"
+                  class="form-select"
+                  onchange="this.form.submit()">
+            <option value="">Pilih Tingkatan...</option>
+            <% @room_levels.each do |level| %>
+              <option value="<%= level.id %>"
+                <%= 'selected' if level == @selected_level %>>
+                <%= level.name %>
+              </option>
+            <% end %>
+          </select>
+        </div>
+      <% end %>
+
+      <% if @selected_level %>
+        <hr>
+
+        <!-- TAMBAH FASILITAS -->
+        <%= form_with model: @facility,
+                      url: admin_facilities_path,
+                      local: true do |f| %>
+
+          <%= f.hidden_field :room_level_id,
+                             value: @selected_level.id %>
+
+          <div class="row g-3 align-items-center mb-3">
+            <div class="col-auto">
+              <%= f.text_field :name,
+                    class: "form-control",
+                    placeholder: "Nama fasilitas baru" %>
+            </div>
+            <div class="col-auto">
+              <%= f.submit "Tambah",
+                    class: "btn btn-primary" %>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- LIST FASILITAS -->
+        <ul class="list-group">
+          <% @facilities.each do |f| %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <%= f.name %>
+
+              <div>
+                <!-- EDIT -->
+                <%= form_with model: f,
+                              url: admin_facility_path(f),
+                              method: :patch,
+                              local: true,
+                              class: "d-inline" do |form| %>
+                  <%= form.text_field :name,
+                        value: f.name,
+                        class: "form-control d-inline w-auto" %>
+                  <%= form.submit "Simpan",
+                        class: "btn btn-success btn-sm" %>
+                <% end %>
+
+                <!-- HAPUS -->
+                <%= link_to "Hapus",
+                    admin_facility_path(f),
+                    method: :delete,
+                    data: { confirm: "Hapus fasilitas ini?" },
+                    class: "btn btn-danger btn-sm ms-2" %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+
+    </div>
+  </div>
+</main>
+
+

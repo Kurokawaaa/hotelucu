@@ -1,0 +1,7 @@
+{
+    "gitignore": "none",
+    "excludeFiles": [],
+    "includeFiles": [
+        "public/assets/**"
+    ]
+}

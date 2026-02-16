@@ -1,0 +1,59 @@
+<div class="row row-cols-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-4">
+  <div class="col">
+    <div class="card overflow-hidden radius-10">
+      <div class="card-body">
+        <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
+          <div class="w-50">
+            <p>Total pengguna</p>
+            <h4 class="text-info"><%= @users %></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card overflow-hidden radius-10">
+      <div class="card-body">
+        <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
+          <div class="w-50">
+            <p>Total Kamar</p>
+            <h4 class="text-primary"><%= @rooms %></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card overflow-hidden radius-10">
+      <div class="card-body">
+        <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
+          <div class="w-50">
+            <p>Total admin</p>
+            <h4 class="text-info"><%= @total_admin %></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card overflow-hidden radius-10">
+      <div class="card-body">
+        <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
+          <div class="w-50">
+            <p>Total Booking</p>
+            <h4 class="text-primary"><%= @bookings %></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="/assets/plugins/chartjs/js/Chart.min.js"></script>
+<script src="/assets/plugins/chartjs/js/Chart.extension.js"></script>
+<script src="/assets/plugins/apexcharts-bundle/js/apexcharts.min.js"></script>
+<script src="/assets/js/dashboard.js"></script>

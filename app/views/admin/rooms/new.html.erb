@@ -1,0 +1,22 @@
+<h2>Tambah Kamar</h2>
+
+<%= form_with model: [:admin, @room] do |f| %>
+
+  <div>
+    <%= f.label :room_number, "Nomor Kamar" %><br>
+    <%= f.text_field :room_number %>
+  </div>
+
+  <div>
+    <%= f.label :room_level_id, "Tingkatan Kamar" %><br>
+    <%= f.collection_select :room_level_id, @room_levels, :id, :name %>
+  </div>
+
+  <div>
+    <%= f.submit "Simpan" %>
+  </div>
+
+<% end %>
+
+<br>
+<%= link_to "Kembali", admin_rooms_path %>

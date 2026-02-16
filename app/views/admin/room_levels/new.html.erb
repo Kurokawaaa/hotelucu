@@ -1,0 +1,28 @@
+<%= form_with model: [:admin, @room_level] do |f| %>
+
+  <div>
+    <%= f.label :name, "Nama Tingkatan" %><br>
+    <%= f.text_field :name %>
+  </div>
+
+  <div>
+    <%= f.label :price, "Harga" %><br>
+    <%= f.number_field :price %>
+  </div>
+
+  <hr>
+
+  <h3>Fasilitas</h3>
+
+  <% Facility.all.each do |facility| %>
+    <div>
+      <%= check_box_tag "room_level[facility_ids][]",
+                        facility.id,
+                        @room_level.facility_ids.include?(facility.id) %>
+      <%= facility.name %>
+    </div>
+  <% end %>
+
+  <%= f.submit %>
+
+<% end %>

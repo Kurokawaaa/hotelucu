@@ -1,0 +1,12 @@
+<h2>Daftar Booking Saya</h2>
+
+<% @bookings.each do |booking| %>
+  <div class="booking-item" style="border-bottom: 1px solid #ccc; margin-bottom: 10px;">
+    <p>Kode Booking: <strong><%= booking.booking_code %></strong></p>
+    <p>Kamar: <%= booking.room.room_number %></p>
+    <p>Tipe: <%= booking.room.room_level.name %></p>
+    <p>Harga: Rp <%= booking.room.room_level.price %></p>
+    <p>Status: <strong><%= booking.status %></strong></p>
+    <%= link_to "Detail", booking_path(booking) %>
+  </div>
+<% end %>

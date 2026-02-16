@@ -1,0 +1,32 @@
+<%= form_with model: [:admin, @room_level] do |f| %>
+
+  <div>
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+
+  <div>
+    <%= f.label :price %>
+    <%= f.number_field :price %>
+  </div>
+
+  <hr>
+
+  <h3>Facilities</h3>
+
+  <%= f.fields_for :room_level_facilities do |rf| %>
+    <div>
+      <%= rf.collection_select :facility_id,
+          Facility.all,
+          :id,
+          :name,
+          prompt: "Pilih fasilitas" %>
+
+      <%= rf.check_box :_destroy %>
+      <%= rf.label :_destroy, "Hapus" %>
+    </div>
+  <% end %>
+
+  <%= f.submit %>
+
+<% end %>

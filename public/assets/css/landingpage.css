@@ -1,0 +1,312 @@
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+}
+
+/* ================= LUXURY SECTION ================= */
+.luxury-section {
+  background: #000;
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.luxury-inner {
+  display: flex;
+  width: 100%;
+}
+
+/* IMAGE SIDE (LEBIH BESAR) */
+.luxury-image {
+  position: relative;
+  width: 60%;
+  background: url('../images/galeri/rich.webp') center/cover no-repeat;
+}
+
+/* DIAGONAL EFFECT */
+.luxury-image::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -120px;
+  width: 240px;
+  height: 100%;
+  background: #ffffff;
+  transform: skewX(-10deg);
+  z-index: 2;
+}
+
+/* CONTENT SIDE */
+.luxury-content {
+  width: 40%;
+  background: #ffffff;
+  padding: 100px 80px;
+  display: flex;
+  align-items: center;
+  z-index: 3;
+}
+
+.luxury-tag {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #b08a57;
+  font-weight: 600;
+  margin-bottom: 18px;
+  display: inline-block;
+}
+
+.luxury-content h2 {
+  font-family: Georgia, serif;
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #2c5364;
+}
+
+.luxury-content p {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 18px;
+}
+
+/* FEATURES */
+.luxury-features {
+  list-style: none;
+  padding: 0;
+  margin: 30px 0 40px;
+}
+
+.luxury-features li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  color: #333;
+}
+
+.luxury-features i {
+  color: #b08a57; /* gold accent */
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* BUTTON */
+.luxury-btn {
+  padding: 14px 46px;
+  border-radius: 30px;
+  font-weight: 600;
+}
+
+/* ANIMATION */
+.animate-fade-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all .9s ease;
+}
+
+.animate-fade-up.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* RESPONSIVE */
+@media (max-width: 991px) {
+  .luxury-inner {
+    flex-direction: column;
+  }
+
+  .luxury-image {
+    width: 100%;
+    height: 320px;
+  }
+
+  .luxury-image::after {
+    display: none;
+  }
+
+  .luxury-content {
+    width: 100%;
+    padding: 60px 40px;
+    text-align: center;
+  }
+}
+
+
+/* HERO */
+.hero-section {
+  min-height: 100vh;
+  background:
+    linear-gradient(
+      rgba(0, 0, 0, 0.65),
+      rgba(0, 0, 0, 0.65)
+    ),
+    url('../images/gallery/bghotel.webp') center/cover no-repeat;
+}
+
+.hero-title {
+  font-size: 54px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  opacity: 0.9;
+}
+
+/* ROOM PREVIEW */
+.room-preview-section {
+  padding: 0;
+  background: #f8f9fa;
+}
+
+.room-preview-section a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.room-card {
+  background: #fff;
+  border-radius: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #0f2027;
+}
+
+.room-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.room-card-body {
+  padding: 30px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.room-card-body p {
+  flex-grow: 1;
+  font-size: 15px;
+  color: #666;
+}
+
+.price {
+  font-weight: 600;
+  color: #f0ad4e;
+}
+
+/* Accent */
+.room-rich h5 { color: #2c5364; }
+.room-average h5 { color: #203a43; }
+.room-poor h5 { color: #555; }
+
+/* ROOM GALLERY SLIDER */
+.room-gallery-section {
+  background: #000000;
+  padding: 5px 0;
+  overflow: hidden;
+}
+
+.gallery-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
+.gallery-track {
+  display: flex;
+  width: max-content;
+  animation: scrollGallery 30s linear infinite;
+}
+
+.gallery-track img {
+  width: 620px;
+  height: 400px;
+  object-fit: cover;
+  margin-right: 5px;
+}
+
+/* Animation */
+@keyframes scrollGallery {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+
+/* FOOTER */
+.hotel-footer {
+  background: linear-gradient(180deg, #0f2027, #111);
+  color: #ccc;
+}
+
+.hotel-footer .col-md-4 {
+  margin-top: 40px;
+}
+
+.hotel-footer p {
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.footer-list li {
+  font-size: 14px;
+}
+
+.footer-list a:hover {
+  color: #0787ff;
+  text-decoration: none;
+}
+
+.footer-list li {
+  margin-bottom: 8px;
+}
+
+.footer-list a {
+    margin-bottom: 8px;
+    text-decoration: none;
+    color: #ccc;
+}
+
+.footer-toggle {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-toggle i {
+  transition: transform 0.3s ease;
+}
+
+/* icon muter pas kebuka */
+.footer-toggle[aria-expanded="true"] i {
+  transform: rotate(180deg);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+  }
+}

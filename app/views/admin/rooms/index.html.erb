@@ -1,0 +1,167 @@
+<main class="page-content-body-card">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-xl-10">
+
+        <div class="card radius-10">
+          <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">Data Kamar</h5>
+              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRoomModal">
+                Tambah Kamar
+              </button>
+
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-striped align-middle">
+                <thead class="table-dark">
+                  <tr>
+                    <th>No Kamar</th>
+                    <th>Tingkatan</th>
+                    <th>Harga</th>
+                    <th>Status</th>
+                    <th class="text-center">Aksi</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <% @rooms.each do |room| %>
+                    <tr>
+                      <td><%= room.room_number %></td>
+                      <td>
+                        <span class="badge bg-info">
+                          <%= room.room_level.name %>
+                        </span>
+                      </td>
+                      <td>
+                        Rp <%= number_with_delimiter(room.room_level.price) %>
+                      </td>
+                      <td>
+                        <% if room.booked? %>
+                          <span class="badge bg-danger">Booked</span>
+                        <% elsif room.paid? %>
+                          <span class="badge bg-warning text-dark">Paid</span>
+                        <% else %>
+                          <span class="badge bg-success">Tersedia</span>
+                        <% end %>
+                      </td>
+                      <td class="text-center">
+                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editRoomModal-<%= room.id %>">
+                          Edit
+                        </button>
+
+                        <%= link_to "Hapus",
+                              admin_room_path(room),
+                              method: :delete,
+                              data: { confirm: "Hapus kamar ini?" },
+                              class: "btn btn-danger btn-sm ms-1" %>
+                      </td>
+                    </tr>
+
+                  <% end %>
+
+                  <% if @rooms.empty? %>
+                    <tr>
+                      <td colspan="5" class="text-center text-muted">
+                        Belum ada data kamar
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+
+              <% @rooms.each do |room| %>
+                <div class="modal fade" id="editRoomModal-<%= room.id %>" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+
+                      <div class="modal-header">
+                        <h5 class="modal-title">Edit Kamar</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+
+                      <%= form_with model: [:admin, room], local: true do |f| %>
+                        <div class="modal-body">
+
+                          <div class="mb-3">
+                            <%= f.label :room_number, "Nomor Kamar", class: "form-label" %>
+                            <%= f.text_field :room_number, class: "form-control" %>
+                          </div>
+
+                          <div class="mb-3">
+                            <%= f.label :room_level_id, "Tingkatan Kamar", class: "form-label" %>
+                            <%= f.collection_select :room_level_id,
+                                  @room_levels,
+                                  :id,
+                                  :name,
+                                  {},
+                                  class: "form-select" %>
+                          </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Batal
+                          </button>
+                          <%= f.submit "Simpan", class: "btn btn-primary" %>
+                        </div>
+                      <% end %>
+
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+
+              <div class="modal fade" id="addRoomModal" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+
+                    <div class="modal-header">
+                      <h5 class="modal-title">Tambah Kamar</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <%= form_with model: [:admin, @room], local: true do |f| %>
+                      <div class="modal-body">
+
+                        <div class="mb-3">
+                          <%= f.label :room_number, "Nomor Kamar", class: "form-label" %>
+                          <%= f.text_field :room_number, class: "form-control" %>
+                        </div>
+
+                        <div class="mb-3">
+                          <%= f.label :room_level_id, "Tingkatan Kamar", class: "form-label" %>
+                          <%= f.collection_select :room_level_id,
+                                @room_levels,
+                                :id,
+                                :name,
+                                {},
+                                class: "form-select" %>
+                        </div>
+
+                      </div>
+
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                          Batal
+                        </button>
+                        <%= f.submit "Simpan", class: "btn btn-primary" %>
+                      </div>
+                    <% end %>
+
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>

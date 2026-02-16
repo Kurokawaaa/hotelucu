@@ -1,0 +1,182 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background: #ffffff;
+}
+
+.logo {
+  width: 200px;
+  height: 200px;
+}
+
+.container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
+  background: url('../images/gallery/rich.webp') center/cover no-repeat;
+}
+
+/* LEFT SIDE */
+.left-side {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  color: rgb(255, 255, 255);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-shadow: 0px 10px 10px rgba(0,0,0,1);
+}
+
+.login-title {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-weight: 800;
+  color: rgb(255, 255, 255);
+  text-shadow: 0px 5px 10px rgba(0,0,0,1);
+}
+
+.MyHtls {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 50px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #ce763c;
+  text-shadow: 0px 5px 10px rgba(0,0,0,0.5);
+}
+
+.brand {
+  text-align: center;
+  z-index: 2;
+  transform: translateY(-20px);
+}
+
+.brand h1 {
+  font-size: 40px;
+  font-weight: 1000;
+  letter-spacing: 2px;
+}
+
+.brand p {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #e0e0e0;
+}
+
+/* RIGHT SIDE */
+.right-side {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-card {
+  height: auto;
+  width: 75%;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0px 30px 30px rgba(0,0,0,0.08);
+  animation: fadeUp 0.5s ease;
+}
+
+.logo-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.logo-wrapper h2 {
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logo h2 {
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  font-size: 14px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  outline: none;
+  transition: 0.3s;
+}
+
+.input-group input:focus {
+  border-color: #000;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #333;
+}
+
+.footer-text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+}
+
+.footer-text a {
+  color: #000;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.register:hover {
+  text-decoration: underline;
+}
+
+/* RESPONSIVE */
+@media (max-width: 800px) {
+  .left-side {
+    display: none;
+  }
+  .right-side {
+    flex: 1;
+  }
+}
