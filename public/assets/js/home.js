@@ -1,6 +1,15 @@
 let selectedRating = 0;
 let homeSwiper = null;
 let homeFlatpickr = null;
+const homeCommentsStorageKey = "home-comments";
+const defaultComments = [
+  {
+    name: "andi",
+    text: "Hotelnya nyaman banget dan pelayanannya ramah!",
+    rating: 5,
+    time: "10 Apr 2026, 09.00"
+  }
+];
 
 function initHomePage() {
   const root = document.querySelector(".hero-section");
@@ -102,6 +111,8 @@ function initHomePage() {
   }
 
   function updateGuestText() {
+    if (!adultCount || !childCount || !roomCount || !guestValue) return;
+
     const minRoom = calculateMinRoom(adult, child);
 
     if (room < minRoom) room = minRoom;
@@ -176,15 +187,16 @@ function initHomePage() {
 
   document.querySelectorAll(".star").forEach((star) => {
     star.addEventListener("click", function () {
-      selectedRating = Number(this.getAttribute("data-value"));
-
-      document.querySelectorAll(".star").forEach((item) => item.classList.remove("active"));
-
-      for (let i = 0; i < selectedRating; i += 1) {
-        document.querySelectorAll(".star")[i].classList.add("active");
-      }
+      setSelectedRating(Number(this.getAttribute("data-value")));
     });
   });
+
+  function setSelectedRating(rating) {
+    selectedRating = rating;
+    document.querySelectorAll(".star").forEach((item, index) => {
+      item.classList.toggle("active", index < rating);
+    });
+  }
 
   function getTimestamp() {
     const now = new Date();
@@ -196,6 +208,64 @@ function initHomePage() {
       year: "numeric"
     });
   }
+
+  function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function readComments() {
+    try {
+      const storedComments = localStorage.getItem(homeCommentsStorageKey);
+      if (!storedComments) return [...defaultComments];
+
+      const parsedComments = JSON.parse(storedComments);
+      if (!Array.isArray(parsedComments) || parsedComments.length === 0) {
+        return [...defaultComments];
+      }
+
+      return parsedComments.filter((comment) => {
+        return comment && comment.name && comment.text && Number(comment.rating) > 0;
+      });
+    } catch (_error) {
+      return [...defaultComments];
+    }
+  }
+
+  function saveComments(comments) {
+    localStorage.setItem(homeCommentsStorageKey, JSON.stringify(comments));
+  }
+
+  function buildCommentMarkup(comment) {
+    const safeName = escapeHtml(comment.name);
+    const safeText = escapeHtml(comment.text);
+    const safeTime = escapeHtml(comment.time || getTimestamp());
+    const starsDisplay = "&#9733;".repeat(Number(comment.rating) || 0);
+
+    return `
+      <div class="comment-item">
+        <div class="comment-header d-flex justify-content-between align-items-start gap-3">
+          <div>
+            <span class="comment-username">@${safeName}</span>
+            <div class="comment-rating">${starsDisplay}</div>
+          </div>
+          <span class="comment-time">${safeTime}</span>
+        </div>
+        <p class="comment-text">${safeText}</p>
+      </div>
+    `;
+  }
+
+  function renderComments() {
+    const list = document.getElementById("commentList");
+    if (!list) return;
+
+    const comments = readComments();
+    list.innerHTML = comments.map(buildCommentMarkup).join("");
+  }
+
+  renderComments();
 
   const addCommentBtn = document.getElementById("addCommentBtn");
   if (addCommentBtn) {
@@ -212,26 +282,20 @@ function initHomePage() {
         return;
       }
 
-      const starsDisplay = "*".repeat(selectedRating);
-      const newComment = document.createElement("div");
-      newComment.classList.add("comment-item");
+      const comments = readComments();
+      comments.unshift({
+        name,
+        text,
+        rating: selectedRating,
+        time: getTimestamp()
+      });
+      saveComments(comments);
+      renderComments();
 
-      newComment.innerHTML = `
-        <div class="comment-header">
-          <div>
-            <span class="comment-username">@${name}</span>
-            <div class="comment-rating">${starsDisplay}</div>
-          </div>
-          <span class="comment-time">${getTimestamp()}</span>
-        </div>
-        <p class="comment-text">${text}</p>
-      `;
-
-      list.prepend(newComment);
       nameInput.value = "";
       textInput.value = "";
-      selectedRating = 0;
-      document.querySelectorAll(".star").forEach((item) => item.classList.remove("active"));
+      if (list) list.scrollTop = 0;
+      setSelectedRating(0);
     });
   }
 }

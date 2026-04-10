@@ -12,6 +12,26 @@ class BookingsController < ApplicationController
     @room_levels = RoomLevel.all
     @selected_room_level_id = selected_room_level_id
     @booking_items = default_booking_items
+    @availability_by_room_level = build_room_level_availability(check_in: @booking.check_in, check_out: @booking.check_out)
+  end
+
+  def availability
+    check_in = parse_booking_date(params[:check_in])
+    check_out = parse_booking_date(params[:check_out])
+
+    if check_in.blank? || check_out.blank?
+      render json: { error: "Tanggal check-in dan check-out wajib diisi" }, status: :unprocessable_entity
+      return
+    end
+
+    if check_out <= check_in
+      render json: { error: "Tanggal check-out harus setelah check-in" }, status: :unprocessable_entity
+      return
+    end
+
+    render json: {
+      availability: build_room_level_availability(check_in:, check_out:)
+    }
   end
 
   def create
@@ -237,6 +257,7 @@ class BookingsController < ApplicationController
     @room_levels = RoomLevel.all
     @selected_room_level_id = selected_room_level_id
     @booking_items = items.presence || default_booking_items
+    @availability_by_room_level = build_room_level_availability(check_in:, check_out:)
 
     respond_to do |format|
       format.html do
@@ -264,6 +285,29 @@ class BookingsController < ApplicationController
 
   def default_booking_items
     [ { room_level_id: @selected_room_level_id.to_s, quantity: 1 } ]
+  end
+
+  def build_room_level_availability(check_in:, check_out:)
+    room_levels = RoomLevel.all
+    total_by_room_level = Room.group(:room_level_id).count
+
+    available_by_room_level =
+      if check_in.present? && check_out.present? && check_out > check_in
+        unavailable_room_ids = Booking.unavailable_room_ids(check_in:, check_out:)
+        Room.where.not(id: unavailable_room_ids).group(:room_level_id).count
+      else
+        total_by_room_level
+      end
+
+    room_levels.each_with_object({}) do |room_level, result|
+      total_rooms = total_by_room_level[room_level.id].to_i
+      available_rooms = available_by_room_level[room_level.id].to_i
+
+      result[room_level.id.to_s] = {
+        available: available_rooms,
+        total: total_rooms
+      }
+    end
   end
 
   def calculate_total_amount(items:, room_level_map:, nights:)

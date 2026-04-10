@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get "/home", to: "home#home"
 
   resources :bookings, path: "booking" do
+    get :availability, on: :collection
     post :snap_token, on: :member
     post :confirm_payment, on: :member
   end

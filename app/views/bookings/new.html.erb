@@ -1,9 +1,18 @@
+<% content_for :head do %>
+  <link rel="icon" href="/assets/images/icons/logohtl.png" type="image/png" />
+  <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="/assets/css/home.css" rel="stylesheet">
+<% end %>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
 <style>
   :root { --primary-dark: #0f172a; --accent-color: #3b82f6; }
-  body { background-color: #f1f5f9; }
+  body { background-color: #f1f5f9; padding-top: 96px; }
+  .hotel-navbar { background-color: rgba(15, 23, 42, 0.96) !important; }
   .booking-card { border-radius: 1.25rem; border: none; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; }
   .header-gradient { background: linear-gradient(135deg, var(--primary-dark) 0%, #1e293b 100%); padding: 3rem 2rem; }
   .room-item { transition: all 0.3s ease; border: 1px solid #e2e8f0; background: #ffffff; }
@@ -14,6 +23,66 @@
 </style>
 
 <script src="<%= MidtransSnapService.snap_js_url %>" data-client-key="<%= MidtransSnapService.client_key %>"></script>
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top hotel-navbar">
+  <div class="container-fluid px-5">
+
+    <!-- LEFT : LOGO -->
+    <div class="navbar-left d-flex align-items-center gap-3">
+      <a href="/home"><img src="/assets/images/icons/logohtl.png" class="hotel-logo"></a>
+      <a href="/home" class="hotel-title MyHtls" style="text-decoration: none; color: #ce763c;">MyHtls</a>
+    </div>
+
+    <!-- TOGGLER -->
+    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- CENTER & RIGHT -->
+    <div class="collapse navbar-collapse" id="navMenu">
+
+      <!-- CENTER MENU -->
+      <ul class="navbar-nav navbar-center position-absolute start-50 translate-middle-x gap-4">
+        <li class="nav-item">
+          <a class="nav-link" href="/home">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/booking/">Riwayat Pesanan</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/booking/new">Pesan Sekarang</a>
+        </li>
+         <li class="nav-item">
+          <a class="nav-link" href="about.html">About</a>
+        </li>
+      </ul>
+
+      <!-- RIGHT AUTH -->
+      <ul class="navbar-nav ms-auto gap-3 navbar-auth">
+  <% if user_signed_in? %>
+    <li class="nav-item">
+      <%= link_to "Profile", edit_user_registration_path, class: "nav-link" %>
+    </li>
+    <li class="nav-item">
+      <%= button_to "Logout",
+                    destroy_user_session_path,
+                    method: :delete,
+                    form: { data: { turbo: "false" } }, # Matikan turbo jika logout bermasalah
+                    class: "btn btn-danger" %>
+    </li>
+  <% else %>
+    <li class="nav-item">
+      <%= link_to "Sign In", new_user_session_path, class: "nav-link" %>
+    </li>
+    <li class="nav-item">
+      <%= link_to "Register", new_user_registration_path, class: "btn btn-primary register" %>
+    </li>
+  <% end %>
+</ul>
+
+    </div>
+  </div>
+</nav>
 
 <div class="container py-5">
   <div class="row justify-content-center">
@@ -85,6 +154,16 @@
                           </option>
                         <% end %>
                       </select>
+                      <div class="small mt-2 room-availability text-secondary">
+                        <% selected_availability = @availability_by_room_level.to_h[item[:room_level_id].to_s] %>
+                        <% if item[:room_level_id].present? && selected_availability.present? && @booking.check_in.present? && @booking.check_out.present? && @booking.check_out > @booking.check_in %>
+                          Tersedia <strong><%= selected_availability[:available] %></strong> dari <%= selected_availability[:total] %> kamar untuk tanggal yang dipilih.
+                        <% elsif item[:room_level_id].present? && selected_availability.present? %>
+                          Total kamar untuk tipe ini: <strong><%= selected_availability[:total] %></strong>. Pilih tanggal untuk melihat ketersediaan.
+                        <% else %>
+                          Pilih tipe kamar dan tanggal menginap untuk melihat ketersediaan.
+                        <% end %>
+                      </div>
                     </div>
                     <div class="col-md-3">
                       <label class="form-label-custom mb-2 text-center d-block">Jumlah Kamar</label>
@@ -130,13 +209,95 @@
     const checkIn = document.getElementById("checkIn");
     const checkOut = document.getElementById("checkOut");
     const payButton = document.getElementById("pay-button");
+    const initialAvailability = <%= raw json_escape((@availability_by_room_level || {}).to_json) %>;
 
     if (!form || !rowsContainer || !totalEl || !checkIn || !checkOut || !payButton) return;
     if (form.dataset.midtransBound === "1") return;
     form.dataset.midtransBound = "1";
     let isSubmitting = false;
+    let availabilityMap = initialAvailability || {};
 
     const formatRupiah = (v) => "Rp " + (v || 0).toLocaleString("id-ID");
+    const hasValidDateRange = () => checkIn.value && checkOut.value && new Date(checkOut.value) > new Date(checkIn.value);
+
+    const renderAvailability = (row) => {
+      const select = row.querySelector(".room-level-select");
+      const qtyInput = row.querySelector(".room-qty");
+      const availabilityEl = row.querySelector(".room-availability");
+      const roomLevelId = select.value;
+
+      qtyInput.removeAttribute("max");
+
+      if (!roomLevelId) {
+        availabilityEl.innerHTML = "Pilih tipe kamar dan tanggal menginap untuk melihat ketersediaan.";
+        return;
+      }
+
+      const availability = availabilityMap[roomLevelId];
+
+      if (!availability) {
+        availabilityEl.innerHTML = "Data ketersediaan kamar belum tersedia.";
+        return;
+      }
+
+      if (!hasValidDateRange()) {
+        availabilityEl.innerHTML = `Total kamar untuk tipe ini: <strong>${availability.total}</strong>. Pilih tanggal untuk melihat ketersediaan.`;
+        return;
+      }
+
+      qtyInput.max = availability.available;
+      if (parseInt(qtyInput.value || 0, 10) > availability.available) {
+        qtyInput.value = availability.available > 0 ? availability.available : 1;
+      }
+
+      if (availability.available > 0) {
+        availabilityEl.innerHTML = `Tersedia <strong>${availability.available}</strong> dari ${availability.total} kamar untuk tanggal yang dipilih.`;
+      } else {
+        availabilityEl.innerHTML = "Tidak ada kamar tersedia untuk tipe ini pada tanggal yang dipilih.";
+      }
+    };
+
+    const renderAllAvailability = () => {
+      rowsContainer.querySelectorAll(".room-level-row").forEach(renderAvailability);
+    };
+
+    const fetchAvailability = async () => {
+      if (!checkIn.value || !checkOut.value) {
+        availabilityMap = initialAvailability || {};
+        renderAllAvailability();
+        return;
+      }
+
+      if (!hasValidDateRange()) {
+        renderAllAvailability();
+        return;
+      }
+
+      try {
+        const url = new URL("<%= availability_bookings_path %>", window.location.origin);
+        url.searchParams.set("check_in", checkIn.value);
+        url.searchParams.set("check_out", checkOut.value);
+
+        const response = await fetch(url.toString(), {
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Gagal memuat ketersediaan kamar");
+        }
+
+        availabilityMap = data.availability || {};
+        renderAllAvailability();
+      } catch (_error) {
+        rowsContainer.querySelectorAll(".room-level-row .room-availability").forEach((el) => {
+          el.textContent = "Ketersediaan kamar belum bisa dimuat. Coba lagi.";
+        });
+      }
+    };
 
     const updatePrice = () => {
       let total = 0;
@@ -158,7 +319,10 @@
     };
 
     const bindEvents = (row) => {
-      row.querySelector(".room-level-select").addEventListener("change", updatePrice);
+      row.querySelector(".room-level-select").addEventListener("change", () => {
+        renderAvailability(row);
+        updatePrice();
+      });
       row.querySelector(".room-qty").addEventListener("input", updatePrice);
       row.querySelector(".remove-row").addEventListener("click", () => {
         if (rowsContainer.querySelectorAll(".room-level-row").length > 1) {
@@ -174,11 +338,16 @@
       clone.querySelector(".room-qty").value = 1;
       rowsContainer.appendChild(clone);
       bindEvents(clone);
+      renderAvailability(clone);
       updatePrice();
     };
 
     rowsContainer.querySelectorAll(".room-level-row").forEach(bindEvents);
-    [checkIn, checkOut].forEach(el => el.addEventListener("change", updatePrice));
+    [checkIn, checkOut].forEach(el => el.addEventListener("change", async () => {
+      updatePrice();
+      await fetchAvailability();
+    }));
+    renderAllAvailability();
     updatePrice();
 
     payButton.addEventListener("click", async () => {

@@ -79,84 +79,6 @@
 
     <h1>Sponsor Utama :</h1>
     <iframe frameborder="0" src="https://itch.io/embed/4431423" width="552" height="167"><a href="https://everrnight.itch.io/rendezvous">Rendezvous by EverrNight</a></iframe>
-
-    <!-- SEARCH BOX -->
-    <div class="search-box-grid">
-
-  <!-- DATE -->
-  <div class="search-card" id="dateToggle">
-    <medium>Tanggal Menginap</medium>
-    <div class="search-value">
-      <i class="bi bi-calendar-event"></i>
-      <input type="text" id="dateInput" readonly placeholder="Pilih tanggal">
-    </div>
-
-    <div class="popup date-popup" id="datePopup"></div>
-  </div>
-
-  <!-- GUEST -->
-  <div class="search-card" id="guestToggle">
-    <medium>Tamu & Kamar</medium>
-    <div class="search-value">
-      <i class="bi bi-people"></i>
-      <span id="guestValue">2 Dewasa, 0 Anak, 1 Kamar</span>
-    </div>
-
-    <div class="popup guest-popup" id="guestPopup">
-    <div class="counter">
-      <span>Dewasa</span>
-      <div>
-        <button class="minus" data-type="adult">−</button>
-        <span id="adultCount">2</span>
-        <button class="plus" data-type="adult">+</button>
-      </div>
-    </div>
-
-    <div class="counter">
-      <span>Anak</span>
-      <div>
-        <button class="minus" data-type="child">−</button>
-        <span id="childCount">0</span>
-        <button class="plus" data-type="child">+</button>
-      </div>
-    </div>
-
-    <div class="counter">
-      <span>Kamar</span>
-      <div>
-        <button class="minus" data-type="room">−</button>
-        <span id="roomCount">1</span>
-        <button class="plus" data-type="room">+</button>
-      </div>
-    </div>
-  </div>
-  </div>
-
-  <!-- ROOM -->
-  <div class="search-card" id="roomToggle">
-    <medium>Kelas Kamar</medium>
-    <div class="search-value">
-      <i class="bi bi-door-open"></i>
-      <span id="roomValue">Semua Kelas</span>
-    </div>
-
-    <div class="popup room-popup" id="roomPopup">
-      <ul class="room-options">
-        <li data-value="Semua Kelas">Semua Kelas</li>
-        <li data-value="Kelas Bawah">Kelas Duluxe</li>
-        <li data-value="Kelas Menengah">Kelas Normal</li>
-        <li data-value="Kelas Atas">Kelas Bisnis</li>
-        <li data-value="Kelas Luxury">Kelas Luxury</li>
-      </ul>
-    </div>
-  </div>
-
-  <button class="btn-booking">
-    <i class="bi bi-search"></i>
-    Cari 
-  </button>
-</div>
-
   </div>
 </section>
 
@@ -184,8 +106,8 @@
               <h2>Kelas Duluxe</h2>
 
               <div class="room-meta">
-                <span>👥 2 Tamu</span>
-                <span>🛏 1 Kasur</span>
+                <span><i class="bi bi-people-fill"></i> 2 Tamu</span>
+                <span><i class="bi bi-bed-fill"></i> 1 Kasur</span>
               </div>
 
               <div class="room-divider"></div>
@@ -210,8 +132,8 @@
               <h2>Kelas Normal</h2>
 
               <div class="room-meta">
-                <span>👥 2 Tamu</span>
-                <span>🛏 1 Kasur</span>
+                <span><i class="bi bi-people-fill"></i> 2 Tamu</span>
+                <span><i class="bi bi-bed-fill"></i> 1 Kasur</span>
               </div>
 
               <div class="room-divider"></div>
@@ -236,9 +158,9 @@
               <h2>Kelas Bisnis</h2>
 
               <div class="room-meta">
-                <span>👥 2 Tamu</span>
-                <span>🛏 2 Kasur</span>
-                <span>📶 Wi-Fi</span>
+                <span><i class="bi bi-people-fill"></i> 2 Tamu</span>
+                <span><i class="bi bi-bed-fill"></i> 2 Kasur</span>
+                <span><i class="bi bi-wifi"></i> Wi-Fi</span>
               </div>
 
               <div class="room-divider"></div>
@@ -263,10 +185,10 @@
               <h2>Kelas Luxury</h2>
 
               <div class="room-meta">
-                <span>👥 2 Tamu</span>
-                <span>🛏 2 Kasur</span>
-                <span>📶 Wi-Fi</span>
-                <span>🚪 Custom Room Service</span>
+                <span><i class="bi bi-people-fill"></i> 2 Tamu</span>
+                <span><i class="bi bi-bed-fill"></i> 2 Kasur</span>
+                <span><i class="bi bi-wifi"></i> Wi-Fi</span>
+                <span><i class="bi bi-door-open-fill"></i> Custom Room Service</span>
               </div>
 
               <div class="room-divider"></div>
@@ -300,16 +222,10 @@
     <h4 class="mb-4 fw-bold">Ulasan Pengunjung</h4>
 
     <!-- LIST KOMENTAR -->
-    <div id="commentList" class="comment-list mb-4">
-      <div class="comment-item">
-        <div class="comment-header">
-          <span class="comment-username">andi</span>
-        </div>
-        <p class="comment-text">
-          Hotelnya nyaman banget dan pelayanannya ramah!
-        </p>
-      </div>
-    </div>
+    <div id="commentList" class="comment-list mb-4"></div>
+    <p class="comment-note small text-light opacity-75">
+      Ulasan disimpan sementara di browser ini, jadi tidak memerlukan database.
+    </p>
 
     <!-- FORM -->
     <div class="comment-form">
@@ -321,11 +237,11 @@
 
       <!-- RATING -->
       <div class="rating mb-2">
-        <span class="star" data-value="1">★</span>
-        <span class="star" data-value="2">★</span>
-        <span class="star" data-value="3">★</span>
-        <span class="star" data-value="4">★</span>
-        <span class="star" data-value="5">★</span>
+        <span class="star" data-value="1">&#9733;</span>
+        <span class="star" data-value="2">&#9733;</span>
+        <span class="star" data-value="3">&#9733;</span>
+        <span class="star" data-value="4">&#9733;</span>
+        <span class="star" data-value="5">&#9733;</span>
       </div>
 
       <textarea id="commentText"
@@ -387,7 +303,7 @@
     <hr>
 
     <p class="text-center mb-0">
-      © 2026 Hotelucu. All rights reserved.
+      &copy; 2026 Hotelucu. All rights reserved.
     </p>
   </div>
 </footer>

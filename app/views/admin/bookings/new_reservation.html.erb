@@ -44,7 +44,12 @@
                   <label class="form-label-custom mb-2">Email Tamu</label>
                   <%= email_field_tag "reservation[guest_email]", @reservation_email, class: "form-control", placeholder: "Masukkan email tamu" %>
                 </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom mb-2">No. Telepon Tamu</label>
+                  <%= telephone_field_tag "reservation[guest_no_telp]", @reservation_phone, class: "form-control", placeholder: "Masukkan no. telepon tamu" %>
+                </div>
               </div>
+
 
               <div class="row g-4 mb-5">
                 <div class="col-md-6">
