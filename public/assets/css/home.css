@@ -9,7 +9,7 @@
 
 /* ================= NAVBAR ================= */
 .hotel-navbar {
-  background: transparent;
+  background: rgba(255, 255, 255, 0);
   transition: all 0.4s ease;
   padding: 14px 0;
 }
@@ -101,7 +101,7 @@
 /* ================= HERO ================= */
 .hero-section {
   height: 100vh;
-  background: url("../images/galeri/rich.webp") center/cover;
+  background: url("../images/galeri/10.jpg") center/cover;
   position: relative;
   display: flex;
   align-items: center;
@@ -139,7 +139,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr auto;
   gap: 16px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgb(255, 255, 255, 0.5);
   padding: 20px;
   border-radius: 16px;
   margin-top: 30px;
@@ -147,15 +148,15 @@
 
 .search-card {
   position: relative;
-  border: 1px solid #ddd;
+  background: rgb(255, 255, 255, 0.65);
+  border: 1px solid #ffffff;
   border-radius: 12px;
-  padding: 12px 14px;
+  padding: 10px;
   cursor: pointer;
   color: black;
 }
 
-.search-card small {
-  font-size: 12px;
+.search-card medium {
   color: #424242;
 }
 
@@ -165,6 +166,7 @@
   gap: 10px;
   font-weight: 600;
   margin-top: 4px;
+  white-space: nowrap;
 }
 
 .search-value i {
@@ -188,7 +190,10 @@
   font-weight: 600;
   cursor: pointer;
   padding: 0;
-  width: 160px;
+}
+
+.search-value input {
+  min-width: 220px;
 }
 
 .flatpickr-calendar {
@@ -203,35 +208,19 @@
   border-color: #ff7a00;
 }
 
-/* ===== TRAVELOKA STYLE SEARCH ===== */
-.traveloka-search {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: relative;
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.search-item i {
-  font-size: 22px;
-  color: #0d6efd;
-  justify-content: center;
-}
-
-.search-value {
-  font-weight: 600;
-}
-
-.room-select {
-  border: none;
-  font-weight: 600;
-  background: transparent;
-  padding: 2px 0;
-  outline: none;
-  cursor: pointer;
-}
-
-.room-toggle i {
-  color: #198754;
+.flatpickr-calendar.slide-up {
+  animation: slideUp .3s ease;
 }
 
 .btn-booking {
@@ -240,7 +229,7 @@
   border: none;
   padding: 14px 24px;
   border-radius: 12px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* POPUP */
@@ -250,12 +239,24 @@
   left: 0;
   width: 100%;
   background: #fff;
-  padding: 16px;
-  border-radius: 12px;
+  padding: 20px;
+  border-radius: 16px;
   box-shadow: 0 15px 40px rgba(0,0,0,.25);
-  display: none;
   z-index: 20;
   color: black;
+  
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-15px) scale(0.98);
+  transition: all 0.25s ease;
+  pointer-events: none;
+}
+
+.popup.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
 }
 
 .guest-popup {
@@ -268,6 +269,11 @@
   right: 0; 
   width: 300px; 
   border: 1px solid rgb(175, 175, 175);
+}
+
+.room-divider {
+  border-top: solid 3px rgb(0, 0, 0, 0.75);
+  margin: 15px 0 18px 0;
 }
 
 .room-options {
@@ -315,141 +321,228 @@
 
 /* ================= ROOMS ================= */
 .rooms {
-  padding: 70px 80px;
-  background: white;
-}
-
-.rooms-title {
-  font-size: 40px;
-  margin-bottom: 30px;
-  font-weight: 1000;
-  text-align: center;
-}
-
-.room-slider-wrapper {
+  padding: 50px 60px 100px;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.05), transparent 40%),
+    linear-gradient(180deg, #0f2027, #1a2f38, #1c3d4d);
   position: relative;
-  padding: 0 60px; /* ruang buat tombol */
+  overflow: visible;
 }
 
-#roomSlider {
+.rooms-header {
+  margin-bottom: 60px;
+}
+
+.section-subtitle {
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 2px;
+  font-size: 14px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.title-rooms {
+  font-family: 'Georgia', serif;
+  font-size: 48px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+.title-line {
+  width: 255px;
+  height: 3px;
+  background: #ff7a00;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.swiper {
+  width: 100%;
+  padding: 40px 0 60px;
+  overflow: visible;
+}
+
+.swiper-slide {
+  padding-bottom: 60px;
   display: flex;
-  gap: 24px;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  cursor: grab;
-  -ms-overflow-style: none;  /* IE & Edge */
-  scrollbar-width: none;     
-}
-
-#roomSlider.dragging {
-  cursor: grabbing;
-}
-
-#roomSlider::-webkit-scrollbar {
-  display: none;
+  justify-content: center;
+  overflow: visible;
 }
 
 .room-card {
-  flex: 0 0 auto;
-  min-width: 360px;   
-  max-width: 360px;
+  width: 100%;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
   overflow: hidden;
-  background: #fff;
-  box-shadow: 0 25px 40px rgba(0,0,0,0.1);
-  transition: 0.35s ease;
-}
+  background: #ffffff;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+  transition: all 0.4s ease;
 
-.room-slider.paused .room-card:hover {
-  transform: none;
-}
-
-.room-slider.paused {
-  cursor: default;
-}
-
-.room-card.active {
-  outline: 3px solid #ff7a00;
 }
 
 .room-card:hover {
   transform: translateY(-8px);
+  box-shadow: 0 30px 70px rgba(0,0,0,0.15);
 }
 
 .room-img {
   position: relative;
+  overflow: hidden;
 }
 
 .room-img img {
   width: 100%;
-  height: 230px;
+  height: 300px;
   object-fit: cover;
-  transition: transform .5s ease;
+  transition: transform 0.6s ease;
 }
 
-.room-card:hover img {
-  transform: scale(1.08);
+.room-card:hover .room-img img {
+  transform: scale(1.05);
 }
 
-.price {
-  position: absolute;
-  bottom: 14px;
-  left: 14px;
-  background: rgba(0,0,0,0.75);
-  color: #fff;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-}
-
-.room-info {
-  padding: 18px;
-}
-
-.room-info h3 {
-  font-size: 18px;
-  margin-bottom: 6px;
-}
-
-.room-info p {
-  font-size: 13px;
-  color: #777;
-}
-
-/* tombol geser */
-.nav-btn {
-  position: absolute;
+.swiper-button-next,
+.swiper-button-prev {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
   top: 50%;
   transform: translateY(-50%);
-  z-index: 5;
-  background: rgba(0,0,0,.75);
-  backdrop-filter: blur(8px);
+  transition: 0.3s ease;
+}
+
+.swiper-pagination {
+  position: relative;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+}
+
+.swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: #ddd;
+  opacity: 1;
+  margin: 0 10px !important;
+  transition: all 1s ease;
+  border-radius: 20px;
+}
+
+.swiper-pagination-bullet-active {
+  width: 8px;
+  height: 8px;
+  border-radius: 12px;
+  background: #111;
+  transform: scale(1.6);
+}
+
+.swiper-pagination-bullet {
+  transform: scale(0.8);
+}
+
+.swiper-pagination-bullet-active {
+  transform: scale(1);
+}
+
+
+.price-tag {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: linear-gradient(135deg, #ff7a00, #ffb347);
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-weight: 900;
+  font-size: 18px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  text-decoration-line: underline;
+}
+
+.price-tag span {
+  font-size: 16px;
+}
+
+.room-content {
+  padding: 28px;
+}
+
+.room-content h2 {
+  font-family: 'Georgia', serif;
+  font-size: 35px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #222;
+}
+
+.room-meta {
+  display: flex;
+  flex-wrap: wrap;              /* 🔥 Biar turun ke bawah kalau kepanjangan */
+  gap: 10px 15px;               /* Row gap & column gap */
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.room-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f5f7fa;          /* 🔥 Bikin kayak badge */
+  padding: 6px 12px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: 0.3s;
+}
+
+.room-meta span:hover {
+  background: #ff7a00;
+  color: #fff;
+}
+
+.room-card h2 {
+  letter-spacing: 1px;
+}
+
+.room-card h2:contains("Luxury") {
+  color: #b8860b;
+}
+
+.room-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rating {
+  font-weight: 600;
+  color: #ffaa00;
+}
+
+.book-btn {
+  background: #111;
   color: #fff;
   border: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  font-size: 24px;
+  padding: 14px 22px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
-.nav-btn:hover {
-  opacity: 1;
+.book-btn:hover {
+  background: #ff7a00;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(255,122,0,0.4);
 }
 
-.nav-btn.left {
-  left: -12px;
-}
-
-.nav-btn.right {
-  right: -12px;
-}
-
-.room-slider {
-  cursor: grab;
-}
-
-.room-slider:active {
-  cursor: grabbing;
-}
 
 /* FOOTER */
 .hotel-footer {
@@ -499,6 +592,82 @@
 /* icon muter pas kebuka */
 .footer-toggle[aria-expanded="true"] i {
   transform: rotate(180deg);
+}
+
+/* ================= KOMENTAR PREMIUM ================= */
+
+.comment-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.comment-item {
+  background: rgba(255,255,255,0.06);
+  padding: 18px 20px;
+  border-radius: 14px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: 0.3s;
+}
+
+.comment-item:hover {
+  background: rgba(255,255,255,0.09);
+}
+
+.comment-header {
+  margin-bottom: 6px;
+}
+
+.comment-username {
+  color: #ffb347;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.comment-time {
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+.comment-text {
+  font-size: 16px;   /* 🔥 Dibesarin */
+  line-height: 1.6;
+  margin: 0;
+}
+
+.comment-form textarea {
+  resize: none;
+  border-radius: 10px;
+}
+
+.comment-form input {
+  border-radius: 10px;
+}
+
+.comment-form button {
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.comment-rating {
+  color: #ffc107;
+  font-size: 16px;
+}
+
+/* RATING INPUT */
+.rating {
+  font-size: 22px;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.rating .star {
+  margin-right: 5px;
+  transition: 0.2s;
+}
+
+.rating .star.active {
+  color: #ffc107;
 }
 
 @media (max-width: 768px) {

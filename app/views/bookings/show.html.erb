@@ -1,0 +1,265 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="<%= MidtransSnapService.snap_js_url %>" data-client-key="<%= MidtransSnapService.client_key %>"></script>
+
+<style>
+  body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
+
+  .detail-card {
+    border: none;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    background: #fff;
+  }
+
+  .qr-section {
+    background: #f8fafc;
+    border-radius: 20px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #qrcode img {
+    padding: 12px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  }
+
+  .info-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .info-value {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .price-highlight {
+    color: #10b981;
+    font-size: 2rem;
+    font-weight: 800;
+  }
+
+  .status-pill {
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: capitalize;
+  }
+
+  .status-pending { background: #fef9c3; color: #854d0e; }
+  .status-paid { background: #fef3c7; color: #92400e; }
+  .status-checked_in { background: #dbeafe; color: #1d4ed8; }
+  .status-complete { background: #dcfce7; color: #166534; }
+  .status-expired { background: #fee2e2; color: #991b1b; }
+</style>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-9">
+      <div class="mb-4">
+        <%= link_to bookings_path, class: "text-decoration-none text-muted fw-bold small d-flex align-items-center" do %>
+          <i class="bi bi-arrow-left me-2"></i> KEMBALI KE RIWAYAT
+        <% end %>
+      </div>
+
+      <div class="card detail-card overflow-hidden">
+        <div class="card-body p-4 p-md-5">
+          <div class="row g-5">
+            <div class="col-md-5">
+              <div class="qr-section shadow-sm h-100">
+                <div id="qrcode" class="mb-4"></div>
+                <p class="info-label mb-1">KODE BOOKING</p>
+                <h4 class="fw-bold mb-3">#<%= @booking.booking_code %></h4>
+                <span class="status-pill status-<%= @booking.status.downcase %>">
+                  Status Booking: <%= status_label(@booking.status) %>
+                </span>
+                <span class="status-pill status-<%= @booking.payment_status.downcase %> mt-2">
+                  Status Pembayaran: <%= status_label(@booking.payment_status) %>
+                </span>
+                <% if @booking.overdue_checkout? %>
+                  <span class="status-pill status-expired mt-2">
+                    Status Menginap: Telat
+                  </span>
+                <% end %>
+                <% if @booking.payment_pending? %>
+                  <div class="small text-muted mt-3 text-center">
+                    Batas pembayaran sampai <strong><%= @booking.payment_deadline_at.in_time_zone.strftime("%d %b %Y %H:%M") %></strong>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="col-md-7">
+              <h5 class="fw-bold mb-4 text-dark border-bottom pb-3">Rincian Reservasi</h5>
+
+              <div class="row g-4">
+                <div class="col-sm-6">
+                  <div class="info-label">Tipe Kamar</div>
+                  <div class="info-value text-primary"><%= @booking.room.room_level.name %></div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="info-label">Nomor Kamar</div>
+                  <div class="info-value"><%= @booking.room.room_number %></div>
+                </div>
+                <div class="col-12">
+                  <div class="info-label">Durasi Menginap</div>
+                  <div class="info-value d-flex align-items-center">
+                    <i class="bi bi-calendar3 me-2 text-muted"></i>
+                    <%= @booking.check_in.strftime("%d %b %Y") %> - <%= @booking.check_out.strftime("%d %b %Y") %>
+                  </div>
+                </div>
+
+                <div class="col-12 mt-4 pt-4 border-top">
+                  <div class="info-label">Total Pembayaran</div>
+                  <div class="price-highlight">
+                    <%
+                      nights = (@booking.check_out - @booking.check_in).to_i
+                      nights = 1 if nights <= 0
+                      total = @booking.room.room_level.price * nights
+                    %>
+                    Rp <%= number_with_delimiter(total) %>
+                  </div>
+                  <p class="small text-muted mt-1 italic">*Harga sudah termasuk pajak dan layanan.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer bg-light border-0 p-4 text-center">
+          <div class="d-flex justify-content-center gap-2">
+            <% if @booking.payment_pending? %>
+              <button id="pay-now-button" class="btn btn-primary rounded-pill px-4 fw-bold" data-booking-id="<%= @booking.id %>">
+                <i class="bi bi-credit-card me-2"></i>Bayar Sekarang
+              </button>
+            <% end %>
+            <button onclick="window.print()" class="btn btn-dark rounded-pill px-4 fw-bold">
+              <i class="bi bi-printer me-2"></i>Cetak Bukti
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const renderQRCode = () => {
+    const container = document.getElementById("qrcode");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    new QRCode(container, {
+      text: "<%= @booking.booking_code %>",
+      width: 180,
+      height: 180,
+      colorDark : "#0f172a",
+      colorLight : "#ffffff",
+      correctLevel : QRCode.CorrectLevel.H
+    });
+  };
+
+  const bindPayNow = () => {
+    const payButton = document.getElementById("pay-now-button");
+    if (!payButton) return;
+    if (payButton.dataset.midtransBound === "1") return;
+
+    payButton.dataset.midtransBound = "1";
+    let isSubmitting = false;
+
+    payButton.addEventListener("click", async () => {
+      if (isSubmitting) return;
+      if (typeof snap === "undefined") {
+        alert("Midtrans Snap belum termuat. Cek Client Key Anda.");
+        return;
+      }
+
+      isSubmitting = true;
+      payButton.disabled = true;
+      payButton.textContent = "Memproses...";
+
+      try {
+        const response = await fetch(`/booking/${payButton.dataset.bookingId}/snap_token`, {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "X-CSRF-Token": document.querySelector("meta[name='csrf-token']")?.content || ""
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Gagal membuat token pembayaran");
+        }
+        if (!data.snap_token) {
+          throw new Error("Token pembayaran tidak tersedia");
+        }
+
+        const confirmPayment = async (bookingId, result) => {
+          await fetch(`/booking/${bookingId}/confirm_payment`, {
+            method: "POST",
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+              "X-CSRF-Token": document.querySelector("meta[name='csrf-token']")?.content || ""
+            },
+            body: JSON.stringify(result || {})
+          });
+        };
+
+        snap.pay(data.snap_token, {
+          onSuccess: async function(result) {
+            try {
+              await confirmPayment(payButton.dataset.bookingId, result);
+            } finally {
+              window.location.href = data.show_url;
+            }
+          },
+          onPending: async function(result) {
+            try {
+              await confirmPayment(payButton.dataset.bookingId, result);
+            } finally {
+              window.location.href = data.show_url;
+            }
+          },
+          onError: function() {
+            alert("Pembayaran gagal. Silakan coba lagi.");
+          },
+          onClose: function() {
+            window.location.href = data.show_url;
+          }
+        });
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        isSubmitting = false;
+        payButton.disabled = false;
+        payButton.innerHTML = '<i class="bi bi-credit-card me-2"></i>Bayar Sekarang';
+      }
+    });
+  };
+
+  document.addEventListener("turbo:load", () => {
+    renderQRCode();
+    bindPayNow();
+  });
+  document.addEventListener("DOMContentLoaded", () => {
+    renderQRCode();
+    bindPayNow();
+  });
+</script>

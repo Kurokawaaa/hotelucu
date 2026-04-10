@@ -1,9 +1,10 @@
 
+window.__onPageLoad = window.__onPageLoad || function (callback) {
+    document.addEventListener("turbo:load", callback);
+    document.addEventListener("DOMContentLoaded", callback);
+};
 
-
-
-
-// to do list 
+// to do list
 var todos = [{
     text: "take out the trash",
     done: false,
@@ -13,9 +14,6 @@ var currentTodo = {
     text: "",
     done: false,
     id: 0
-}
-document.getElementById("todo-input").oninput = function (e) {
-    currentTodo.text = e.target.value;
 };
 /*
     //jQuery Version
@@ -62,7 +60,6 @@ function RenderAllTodos() {
         DrawTodo(todos[i]);
     }
 }
-RenderAllTodos();
 
 function DeleteTodo(button) {
     var deleteID = parseInt(button.getAttribute("todo-id"));
@@ -89,11 +86,24 @@ function CreateTodo() {
         text: currentTodo.text,
         done: false,
         id: todos.length
-    }
+    };
     todos.push(newtodo);
     RenderAllTodos();
 }
 
+function initTodoPage() {
+    var todoInput = document.getElementById("todo-input");
+    var container = document.getElementById("todo-container");
+    if (!todoInput || !container) return;
+
+    todoInput.oninput = function (e) {
+        currentTodo.text = e.target.value;
+    };
+
+    RenderAllTodos();
+}
+
+window.__onPageLoad(initTodoPage);
 
 
 

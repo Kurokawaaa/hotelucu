@@ -10,12 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_11_050748) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_10_003246) do
   create_table "bookings", force: :cascade do |t|
     t.string "booking_code"
     t.date "check_in"
     t.date "check_out"
     t.datetime "created_at", null: false
+    t.string "midtrans_snap_token"
+    t.string "payment_status", default: "pending", null: false
     t.integer "room_id", null: false
     t.string "status", default: "paid", null: false
     t.datetime "updated_at", null: false
@@ -55,12 +57,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_11_050748) do
     t.string "status", default: "available", null: false
     t.datetime "updated_at", null: false
     t.index ["room_level_id"], name: "index_rooms_on_room_level_id"
+    t.index ["room_number"], name: "index_rooms_on_room_number", unique: true
   end
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
+    t.integer "no_telp"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"

@@ -39,8 +39,8 @@
                         Rp <%= number_with_delimiter(room.room_level.price) %>
                       </td>
                       <td>
-                        <% if room.booked? %>
-                          <span class="badge bg-danger">Booked</span>
+                        <% if room.occupied? %>
+                          <span class="badge bg-danger">Occupied</span>
                         <% elsif room.paid? %>
                           <span class="badge bg-warning text-dark">Paid</span>
                         <% else %>
@@ -52,11 +52,11 @@
                           Edit
                         </button>
 
-                        <%= link_to "Hapus",
+                        <%= button_to "Hapus",
                               admin_room_path(room),
                               method: :delete,
-                              data: { confirm: "Hapus kamar ini?" },
-                              class: "btn btn-danger btn-sm ms-1" %>
+                              class: "btn btn-danger btn-sm ms-1",
+                              form: { class: "d-inline", onsubmit: "return confirm('Hapus kamar ini?');" } %>
                       </td>
                     </tr>
 

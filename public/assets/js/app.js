@@ -1,6 +1,10 @@
 
+window.__onPageLoad = window.__onPageLoad || function (callback) {
+	document.addEventListener("turbo:load", callback);
+	document.addEventListener("DOMContentLoaded", callback);
+};
 
-$(function() {
+window.__onPageLoad(() => {
 	"use strict";
 
   // Tooltops

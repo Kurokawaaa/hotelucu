@@ -1,0 +1,174 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<style>
+  :root { --primary-dark: #0f172a; --accent-color: #0ea5e9; }
+  .reservation-card { border-radius: 1.25rem; border: none; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; }
+  .header-gradient { background: linear-gradient(135deg, var(--primary-dark) 0%, #1e293b 100%); padding: 2.5rem 2rem; }
+  .room-item { transition: all 0.3s ease; border: 1px solid #e2e8f0; background: #ffffff; }
+  .room-item:hover { border-color: var(--accent-color); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .form-label-custom { font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+</style>
+
+<main class="page-content-body-card">
+  <div class="container-fluid py-4">
+    <div class="row justify-content-center">
+      <div class="col-xl-10">
+        <div class="card reservation-card">
+          <div class="header-gradient text-white">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+              <div>
+                <h3 class="fw-bold mb-1">Reservasi Manual Resepsionis</h3>
+                <p class="text-white-50 mb-0">Buat reservasi kamar untuk tamu langsung dari halaman admin.</p>
+              </div>
+              <%= link_to admin_bookings_path, class: "btn btn-light fw-semibold" do %>
+                <i class="bi bi-arrow-left me-2"></i>Kembali ke Booking
+              <% end %>
+            </div>
+          </div>
+
+          <div class="card-body p-4 p-md-5">
+            <%= form_with url: create_reservation_admin_bookings_path, method: :post, local: true, html: { id: "reservationForm" } do %>
+              <% if flash.now[:alert].present? %>
+                <div class="alert alert-danger rounded-3" role="alert">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i><%= flash.now[:alert] %>
+                </div>
+              <% end %>
+
+              <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label-custom mb-2">Nama Tamu</label>
+                  <%= text_field_tag "reservation[guest_name]", @reservation_name, class: "form-control", placeholder: "Masukkan nama tamu" %>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom mb-2">Email Tamu</label>
+                  <%= email_field_tag "reservation[guest_email]", @reservation_email, class: "form-control", placeholder: "Masukkan email tamu" %>
+                </div>
+              </div>
+
+              <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                  <label class="form-label-custom mb-2">Tanggal Check-In</label>
+                  <%= date_field_tag "reservation[check_in]", @booking.check_in, class: "form-control", id: "reservationCheckIn" %>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom mb-2">Tanggal Check-Out</label>
+                  <%= date_field_tag "reservation[check_out]", @booking.check_out, class: "form-control", id: "reservationCheckOut" %>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center justify-content-between mb-4">
+                <h5 class="fw-bold m-0 text-dark">Pilih Tipe Kamar</h5>
+                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" id="addReservationRoomLevel">
+                  <i class="bi bi-plus-lg me-1"></i> Tambah Tipe
+                </button>
+              </div>
+
+              <div id="reservationRoomLevelRows" class="vstack gap-3">
+                <% @reservation_items.each do |item| %>
+                  <div class="reservation-room-level-row p-3 rounded-4 room-item">
+                    <div class="row g-3 align-items-end">
+                      <div class="col-md-8">
+                        <label class="form-label-custom mb-2">Tipe Kamar</label>
+                        <select name="reservation[items][][room_level_id]" class="form-select reservation-room-level-select">
+                          <option value="">Pilih tipe...</option>
+                          <% @room_levels.each do |level| %>
+                            <option value="<%= level.id %>" data-price="<%= level.price %>" <%= "selected" if level.id.to_s == item[:room_level_id].to_s %>>
+                              <%= level.name %> - Rp <%= number_with_delimiter(level.price) %>/malam
+                            </option>
+                          <% end %>
+                        </select>
+                      </div>
+                      <div class="col-md-2">
+                        <label class="form-label-custom mb-2">Jumlah</label>
+                        <input type="number" name="reservation[items][][quantity]" class="form-control text-center reservation-room-qty" min="1" value="<%= item[:quantity].to_i.positive? ? item[:quantity].to_i : 1 %>">
+                      </div>
+                      <div class="col-md-2">
+                        <button type="button" class="btn btn-link text-danger remove-reservation-row w-100 text-decoration-none">
+                          <i class="bi bi-trash3 me-1"></i> Hapus
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+
+              <div class="alert alert-secondary border-0 rounded-4 mt-5 p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                  <div class="small">
+                    Reservasi manual ini langsung dibuat sebagai booking aktif dari resepsionis.
+                  </div>
+                  <div class="fw-bold fs-5 text-primary" id="reservationTotal">Rp 0</div>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 shadow-sm fs-5">
+                  Simpan Reservasi
+                </button>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("reservationForm");
+    const rowsContainer = document.getElementById("reservationRoomLevelRows");
+    const totalEl = document.getElementById("reservationTotal");
+    const checkIn = document.getElementById("reservationCheckIn");
+    const checkOut = document.getElementById("reservationCheckOut");
+    const addButton = document.getElementById("addReservationRoomLevel");
+
+    if (!form || !rowsContainer || !totalEl || !checkIn || !checkOut || !addButton) return;
+
+    const formatRupiah = (value) => "Rp " + (value || 0).toLocaleString("id-ID");
+
+    const updateTotal = () => {
+      let total = 0;
+      let nights = 1;
+
+      if (checkIn.value && checkOut.value) {
+        const diff = Math.ceil((new Date(checkOut.value) - new Date(checkIn.value)) / (1000 * 3600 * 24));
+        nights = diff > 0 ? diff : 1;
+      }
+
+      rowsContainer.querySelectorAll(".reservation-room-level-row").forEach((row) => {
+        const selected = row.querySelector(".reservation-room-level-select").selectedOptions[0];
+        const price = parseInt(selected?.dataset.price || 0, 10);
+        const quantity = parseInt(row.querySelector(".reservation-room-qty").value || 0, 10);
+        total += price * quantity * nights;
+      });
+
+      totalEl.textContent = formatRupiah(total);
+    };
+
+    const bindRow = (row) => {
+      row.querySelector(".reservation-room-level-select").addEventListener("change", updateTotal);
+      row.querySelector(".reservation-room-qty").addEventListener("input", updateTotal);
+      row.querySelector(".remove-reservation-row").addEventListener("click", () => {
+        if (rowsContainer.querySelectorAll(".reservation-room-level-row").length > 1) {
+          row.remove();
+          updateTotal();
+        }
+      });
+    };
+
+    addButton.addEventListener("click", () => {
+      const clone = rowsContainer.querySelector(".reservation-room-level-row").cloneNode(true);
+      clone.querySelector(".reservation-room-level-select").value = "";
+      clone.querySelector(".reservation-room-qty").value = 1;
+      rowsContainer.appendChild(clone);
+      bindRow(clone);
+      updateTotal();
+    });
+
+    rowsContainer.querySelectorAll(".reservation-room-level-row").forEach(bindRow);
+    [checkIn, checkOut].forEach((element) => element.addEventListener("change", updateTotal));
+    updateTotal();
+  });
+</script>

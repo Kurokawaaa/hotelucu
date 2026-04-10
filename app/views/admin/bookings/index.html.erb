@@ -21,15 +21,70 @@
                   <div class="text-muted small mb-2"><%= @booking.user.email %></div>
                   <div>Kamar: <strong><%= @booking.room.room_number %></strong></div>
                   <div>Tingkat: <strong><%= @booking.room.room_level.name %></strong></div>
-                  <div>Status: <strong><%= @booking.status %></strong></div>
+                  <div>Status: <strong><%= status_label(@booking.status) %></strong></div>
+                  <div>Check-in: <strong><%= @booking.check_in %></strong></div>
+                  <% if @booking_validation_message.present? %>
+                    <div class="alert alert-warning mt-2 mb-0 py-2"><%= @booking_validation_message %></div>
+                  <% end %>
                   <div class="mt-3 d-grid">
-                    <% if @booking.paid? %>
-                      <%= button_to "Validasi & Booked",
+                    <% if @can_validate_booking %>
+                      <%= button_to "Validasi Check-in",
                             validate_admin_booking_path(@booking),
                             method: :patch,
                             class: "btn btn-success" %>
                     <% else %>
-                      <button class="btn btn-secondary" disabled>Sudah Booked</button>
+                      <button class="btn btn-secondary" disabled>Tidak bisa divalidasi hari ini</button>
+                    <% end %>
+                  </div>
+                  <div class="mt-2 d-grid">
+                    <%= button_to "Hapus Booking",
+                          admin_booking_path(@booking),
+                          method: :delete,
+                          data: { turbo_confirm: "Yakin ingin menghapus booking ini?" },
+                          class: "btn btn-outline-danger" %>
+                  </div>
+                </div>
+              <% else %>
+                <div class="alert alert-warning mb-0">Kode booking tidak ditemukan.</div>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="card radius-10 mt-3">
+          <div class="card-body">
+            <h5 class="mb-3">Checkout Booking</h5>
+            <%= form_with url: admin_bookings_path, method: :get, local: true do |f| %>
+              <div class="mb-3">
+                <label class="form-label">Kode Booking</label>
+                <%= text_field_tag :checkout_code, params[:checkout_code], class: "form-control", placeholder: "Contoh: BK-1700000000-AB12" %>
+              </div>
+              <button class="btn btn-primary w-100" type="submit">Cari</button>
+            <% end %>
+
+            <% if params[:checkout_code].present? %>
+              <hr>
+              <% if @checkout_booking.present? %>
+                <div class="p-3 border rounded-3 bg-light">
+                  <div class="fw-semibold"><%= @checkout_booking.booking_code %></div>
+                  <div class="text-muted small mb-2"><%= @checkout_booking.user.email %></div>
+                  <div>Kamar: <strong><%= @checkout_booking.room.room_number %></strong></div>
+                  <div>Tingkat: <strong><%= @checkout_booking.room.room_level.name %></strong></div>
+                  <div>Status: <strong><%= status_label(@checkout_booking.status) %></strong></div>
+                  <div>Check-out: <strong><%= @checkout_booking.check_out %></strong></div>
+                  <% if @checkout_booking.overdue_checkout? %>
+                    <div class="alert alert-danger mt-2 mb-0 py-2">Booking ini telat checkout.</div>
+                  <% elsif @checkout_message.present? %>
+                    <div class="alert alert-warning mt-2 mb-0 py-2"><%= @checkout_message %></div>
+                  <% end %>
+                  <div class="mt-3 d-grid">
+                    <% if @can_checkout_booking %>
+                      <%= button_to "Checkout",
+                            checkout_admin_booking_path(@checkout_booking),
+                            method: :patch,
+                            class: "btn btn-danger" %>
+                    <% else %>
+                      <button class="btn btn-secondary" disabled>Belum bisa checkout</button>
                     <% end %>
                   </div>
                 </div>
@@ -45,7 +100,7 @@
         <div class="card radius-10">
           <div class="card-body">
             <div class="d-flex align-items-center justify-content-between mb-3">
-              <h5 class="mb-0">Daftar Booking Paid</h5>
+              <h5 class="mb-0">Daftar Booking Paid (Check-in Hari Ini)</h5>
               <span class="badge bg-warning text-dark"><%= @paid_bookings.size %> Pending</span>
             </div>
 
@@ -70,10 +125,17 @@
                       <td><%= booking.room.room_level.name %></td>
                       <td><%= booking.check_in %> - <%= booking.check_out %></td>
                       <td class="text-center">
-                        <%= button_to "Validasi",
-                              validate_admin_booking_path(booking),
-                              method: :patch,
-                              class: "btn btn-success btn-sm" %>
+                        <div class="d-flex justify-content-center gap-2">
+                          <%= button_to "Validasi",
+                                validate_admin_booking_path(booking),
+                                method: :patch,
+                                class: "btn btn-success btn-sm" %>
+                          <%= button_to "Hapus",
+                                admin_booking_path(booking),
+                                method: :delete,
+                                data: { turbo_confirm: "Yakin ingin menghapus booking ini?" },
+                                class: "btn btn-outline-danger btn-sm" %>
+                        </div>
                       </td>
                     </tr>
                   <% end %>
@@ -82,6 +144,60 @@
                     <tr>
                       <td colspan="6" class="text-center text-muted">
                         Tidak ada booking yang menunggu validasi
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card radius-10 mt-3">
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h5 class="mb-0">Daftar Booking Checked in</h5>
+              <span class="badge bg-primary"><%= @checked_in_bookings.size %> Tamu</span>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-striped align-middle">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Kode</th>
+                    <th>Pengguna</th>
+                    <th>Kamar</th>
+                    <th>Check-out</th>
+                    <th>Status</th>
+                    <th class="text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @checked_in_bookings.each do |booking| %>
+                    <tr>
+                      <td><%= booking.booking_code %></td>
+                      <td><%= booking.user.email %></td>
+                      <td><%= booking.room.room_number %> - <%= booking.room.room_level.name %></td>
+                      <td><%= booking.check_out %></td>
+                      <td>
+                        <span class="badge bg-primary"><%= status_label(booking.status) %></span>
+                        <% if booking.overdue_checkout? %>
+                          <span class="badge bg-danger">Telat</span>
+                        <% end %>
+                      </td>
+                      <td class="text-center">
+                        <%= button_to "Checkout",
+                              checkout_admin_booking_path(booking),
+                              method: :patch,
+                              class: "btn btn-danger btn-sm" %>
+                      </td>
+                    </tr>
+                  <% end %>
+
+                  <% if @checked_in_bookings.empty? %>
+                    <tr>
+                      <td colspan="6" class="text-center text-muted">
+                        Tidak ada tamu yang sedang checked in
                       </td>
                     </tr>
                   <% end %>
@@ -102,7 +218,7 @@
               <div class="d-flex flex-wrap gap-2">
                 <span class="badge bg-success">Tersedia</span>
                 <span class="badge bg-warning text-dark">Paid</span>
-                <span class="badge bg-danger">Booked</span>
+                <span class="badge bg-danger">Occupied</span>
               </div>
             </div>
 
@@ -129,7 +245,7 @@
                 <div class="room-status-box room-status-<%= room.status %>">
                   <div class="fw-bold"><%= room.room_number %></div>
                   <div class="small"><%= room.room_level.name %></div>
-                  <div class="small text-uppercase"><%= room.status %></div>
+                  <div class="small text-uppercase"><%= status_label(room.status) %></div>
                 </div>
               <% end %>
             </div>
@@ -173,7 +289,7 @@
     color: #664d03;
   }
 
-  .room-status-booked {
+  .room-status-occupied {
     background: #f8d7da;
     color: #842029;
   }

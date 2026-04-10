@@ -8,4 +8,12 @@ class User < ApplicationRecord
   def admin?
     role == "admin"
   end
+
+  def resepsionis?
+    role == "resepsionis"
+  end
+
+  def admin_panel?
+    admin? || resepsionis?
+  end
 end

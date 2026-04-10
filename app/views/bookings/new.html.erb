@@ -1,78 +1,118 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<style>
+  :root { --primary-dark: #0f172a; --accent-color: #3b82f6; }
+  body { background-color: #f1f5f9; }
+  .booking-card { border-radius: 1.25rem; border: none; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; }
+  .header-gradient { background: linear-gradient(135deg, var(--primary-dark) 0%, #1e293b 100%); padding: 3rem 2rem; }
+  .room-item { transition: all 0.3s ease; border: 1px solid #e2e8f0; background: #ffffff; }
+  .room-item:hover { border-color: var(--accent-color); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .btn-primary { background-color: var(--accent-color); border: none; padding: 0.75rem 1.5rem; font-weight: 600; }
+  .btn-primary:hover { background-color: #2563eb; }
+  .form-label-custom { font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+</style>
+
+<script src="<%= MidtransSnapService.snap_js_url %>" data-client-key="<%= MidtransSnapService.client_key %>"></script>
+
 <div class="container py-5">
   <div class="row justify-content-center">
-    <div class="col-12 col-lg-9 col-xl-8">
-      <div class="card border-0 shadow-lg radius-10 overflow-hidden">
-        <div class="card-header bg-primary text-white py-4">
-          <div class="d-flex align-items-center justify-content-between">
-            <div>
-              <h4 class="mb-1">Booking Kamar</h4>
-              <p class="mb-0 opacity-75">Pilih tingkatan kamar dan jumlahnya</p>
+    <div class="col-lg-10">
+      <div class="card booking-card">
+        <div class="header-gradient text-white">
+          <div class="row align-items-center">
+            <div class="col-md-7">
+              <div class="mb-4">
+                <%= link_to :back, class: "text-decoration-none -muted fw-bold small d-flex align-items-center" do %>
+                  <i class="bi bi-chevron-left me-2"></i> KEMBALI
+                <% end %>
+              </div>
+              <h2 class="fw-bold mb-2">Reservasi Kamar</h2>
+              <p class="text-white-50 mb-0">Atur masa inap dan pilih tipe kamar terbaik Anda.</p>
             </div>
-            <div class="text-end">
-              <div class="small opacity-75">Total Pembayaran</div>
-              <div class="h5 mb-0" id="bookingTotal">Rp 0</div>
+            <div class="col-md-5 text-md-end mt-4 mt-md-0">
+              <div class="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-20">
+                <span class="d-block small text-white-50 fw-semibold">TOTAL PEMBAYARAN</span>
+                <span class="h2 fw-bold text-info mb-0" id="bookingTotal">Rp 0</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="card-body p-4 p-lg-5">
-          <%= form_with model: @booking, url: bookings_path, local: true do |f| %>
-            <div class="row g-4">
+        <div class="card-body p-4 p-md-5">
+          <%= form_with model: @booking, url: bookings_path, local: true, html: { id: "bookingForm" } do |f| %>
+            <% if flash.now[:alert].present? %>
+              <div class="alert alert-danger rounded-3" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i><%= flash.now[:alert] %>
+              </div>
+            <% end %>
+
+            <div class="row g-4 mb-5">
               <div class="col-md-6">
-                <div class="p-3 bg-light rounded-3 h-100">
-                  <%= f.label :check_in, "Check In", class: "form-label fw-semibold" %>
-                  <%= f.date_field :check_in, class: "form-control form-control-lg", id: "checkIn" %>
+                <label class="form-label-custom mb-2">Tanggal Check-In</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-event"></i></span>
+                  <%= f.date_field :check_in, class: "form-control bg-light border-start-0", id: "checkIn" %>
                 </div>
               </div>
               <div class="col-md-6">
-                <div class="p-3 bg-light rounded-3 h-100">
-                  <%= f.label :check_out, "Check Out", class: "form-label fw-semibold" %>
-                  <%= f.date_field :check_out, class: "form-control form-control-lg", id: "checkOut" %>
+                <label class="form-label-custom mb-2">Tanggal Check-Out</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-check"></i></span>
+                  <%= f.date_field :check_out, class: "form-control bg-light border-start-0", id: "checkOut" %>
                 </div>
               </div>
             </div>
 
-            <div class="d-flex align-items-center justify-content-between mt-5 mb-3">
-              <div>
-                <h6 class="mb-1">Detail Kamar</h6>
-                <small class="text-muted">Tambah lebih dari satu tingkatan jika perlu</small>
-              </div>
-              <button type="button" class="btn btn-outline-primary btn-sm" id="addRoomLevel">
-                Tambah Tingkatan
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <h5 class="fw-bold m-0 text-dark">Daftar Pilihan Kamar</h5>
+              <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" id="addRoomLevel">
+                <i class="bi bi-plus-lg me-1"></i> Tambah Tipe
               </button>
             </div>
 
             <div id="roomLevelRows" class="vstack gap-3">
-              <div class="room-level-row p-3 border rounded-3 bg-white shadow-sm">
-                <div class="row g-3 align-items-end">
-                  <div class="col-md-7">
-                    <label class="form-label fw-semibold">Tingkatan Kamar</label>
-                    <select name="booking[items][][room_level_id]" class="form-select room-level-select">
-                      <option value="">Pilih tingkatan</option>
-                      <% @room_levels.each do |level| %>
-                        <option value="<%= level.id %>" data-price="<%= level.price %>">
-                          <%= level.name %> - Rp <%= number_with_delimiter(level.price) %>/malam
-                        </option>
-                      <% end %>
-                    </select>
+              <% (@booking_items || [ { room_level_id: @selected_room_level_id.to_s, quantity: 1 } ]).each do |item| %>
+                <div class="room-level-row p-3 rounded-4 room-item">
+                  <div class="row g-3 align-items-end">
+                    <div class="col-md-6">
+                      <label class="form-label-custom mb-2">Tipe Kamar</label>
+                      <select name="booking[items][][room_level_id]" class="form-select border-0 bg-light room-level-select">
+                        <option value="">Pilih tipe...</option>
+                        <% @room_levels.each do |level| %>
+                          <option value="<%= level.id %>" data-price="<%= level.price %>" <%= "selected" if level.id.to_s == item[:room_level_id].to_s %>>
+                            <%= level.name %> - Rp <%= number_with_delimiter(level.price) %>/malam
+                          </option>
+                        <% end %>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label-custom mb-2 text-center d-block">Jumlah Kamar</label>
+                      <input type="number" name="booking[items][][quantity]" class="form-control border-0 bg-light text-center room-qty" min="1" value="<%= item[:quantity].to_i.positive? ? item[:quantity].to_i : 1 %>">
+                    </div>
+                    <div class="col-md-3">
+                      <button type="button" class="btn btn-link text-danger remove-row w-100 text-decoration-none">
+                        <i class="bi bi-trash3 me-1"></i> Hapus
+                      </button>
+                    </div>
                   </div>
-                  <div class="col-md-3">
-                    <label class="form-label fw-semibold">Jumlah</label>
-                    <input type="number" name="booking[items][][quantity]" class="form-control room-qty" min="1" value="1">
-                  </div>
-                  <div class="col-md-2 d-grid">
-                    <button type="button" class="btn btn-outline-danger remove-row">Hapus</button>
-                  </div>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="alert alert-secondary border-0 rounded-4 mt-5 p-4">
+              <div class="d-flex gap-3 align-items-center">
+                <i class="bi bi-info-circle-fill fs-4 text-primary"></i>
+                <div class="small">
+                  Total biaya otomatis dikalikan dengan jumlah malam menginap. Pastikan data sudah benar sebelum memproses.
                 </div>
               </div>
             </div>
 
-            <div class="alert alert-info mt-4 mb-0">
-              Total dihitung dari harga per malam x jumlah kamar x jumlah malam.
-            </div>
-
-            <div class="d-flex justify-content-end mt-4">
-              <%= f.submit "Booking Sekarang", class: "btn btn-primary btn-lg px-4" %>
+            <div class="mt-4">
+              <button id="pay-button" type="button" class="btn btn-primary w-100 py-3 rounded-3 shadow-sm fs-5">
+                Lanjutkan Pembayaran
+              </button>
             </div>
           <% end %>
         </div>
@@ -81,66 +121,141 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
+  const initBooking = () => {
+    const form = document.getElementById("bookingForm");
     const rowsContainer = document.getElementById("roomLevelRows");
-    const addButton = document.getElementById("addRoomLevel");
     const totalEl = document.getElementById("bookingTotal");
     const checkIn = document.getElementById("checkIn");
     const checkOut = document.getElementById("checkOut");
+    const payButton = document.getElementById("pay-button");
 
-    const formatRupiah = (value) => {
-      return "Rp " + (value || 0).toLocaleString("id-ID");
-    };
+    if (!form || !rowsContainer || !totalEl || !checkIn || !checkOut || !payButton) return;
+    if (form.dataset.midtransBound === "1") return;
+    form.dataset.midtransBound = "1";
+    let isSubmitting = false;
 
-    const nightsBetween = () => {
-      if (!checkIn.value || !checkOut.value) return 1;
-      const inDate = new Date(checkIn.value);
-      const outDate = new Date(checkOut.value);
-      const diff = Math.ceil((outDate - inDate) / (1000 * 60 * 60 * 24));
-      return diff > 0 ? diff : 1;
-    };
+    const formatRupiah = (v) => "Rp " + (v || 0).toLocaleString("id-ID");
 
-    const updateTotal = () => {
+    const updatePrice = () => {
       let total = 0;
-      const nights = nightsBetween();
+      let nights = 1;
 
-      rowsContainer.querySelectorAll(".room-level-row").forEach((row) => {
-        const select = row.querySelector(".room-level-select");
-        const qtyInput = row.querySelector(".room-qty");
-        const price = parseInt(select.selectedOptions[0]?.dataset.price || "0", 10);
-        const qty = parseInt(qtyInput.value || "0", 10);
+      if (checkIn.value && checkOut.value) {
+        const diff = Math.ceil((new Date(checkOut.value) - new Date(checkIn.value)) / (1000 * 3600 * 24));
+        nights = diff > 0 ? diff : 1;
+      }
+
+      rowsContainer.querySelectorAll(".room-level-row").forEach(row => {
+        const selected = row.querySelector(".room-level-select").selectedOptions[0];
+        const price = parseInt(selected?.dataset.price || 0, 10);
+        const qty = parseInt(row.querySelector(".room-qty").value || 0, 10);
         total += price * qty * nights;
       });
 
       totalEl.textContent = formatRupiah(total);
     };
 
-    const bindRowEvents = (row) => {
-      row.querySelector(".room-level-select").addEventListener("change", updateTotal);
-      row.querySelector(".room-qty").addEventListener("input", updateTotal);
+    const bindEvents = (row) => {
+      row.querySelector(".room-level-select").addEventListener("change", updatePrice);
+      row.querySelector(".room-qty").addEventListener("input", updatePrice);
       row.querySelector(".remove-row").addEventListener("click", () => {
         if (rowsContainer.querySelectorAll(".room-level-row").length > 1) {
           row.remove();
-          updateTotal();
+          updatePrice();
         }
       });
     };
 
-    rowsContainer.querySelectorAll(".room-level-row").forEach(bindRowEvents);
-    checkIn.addEventListener("change", updateTotal);
-    checkOut.addEventListener("change", updateTotal);
-
-    addButton.addEventListener("click", () => {
-      const template = rowsContainer.querySelector(".room-level-row");
-      const clone = template.cloneNode(true);
+    document.getElementById("addRoomLevel").onclick = () => {
+      const clone = rowsContainer.querySelector(".room-level-row").cloneNode(true);
       clone.querySelector(".room-level-select").value = "";
       clone.querySelector(".room-qty").value = 1;
       rowsContainer.appendChild(clone);
-      bindRowEvents(clone);
-      updateTotal();
-    });
+      bindEvents(clone);
+      updatePrice();
+    };
 
-    updateTotal();
-  });
+    rowsContainer.querySelectorAll(".room-level-row").forEach(bindEvents);
+    [checkIn, checkOut].forEach(el => el.addEventListener("change", updatePrice));
+    updatePrice();
+
+    payButton.addEventListener("click", async () => {
+      if (isSubmitting) return;
+      if (typeof snap === "undefined") {
+        alert("Midtrans Snap belum termuat. Cek Client Key Anda.");
+        return;
+      }
+
+      isSubmitting = true;
+      payButton.disabled = true;
+      payButton.textContent = "Memproses...";
+
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "X-CSRF-Token": document.querySelector("meta[name='csrf-token']")?.content || ""
+          },
+          body: new FormData(form)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Booking gagal dibuat");
+        }
+        if (!data.snap_token) {
+          throw new Error("Token pembayaran tidak tersedia");
+        }
+
+        const confirmPayment = async (bookingId, result) => {
+          if (!bookingId) return;
+          await fetch(`/booking/${bookingId}/confirm_payment`, {
+            method: "POST",
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+              "X-CSRF-Token": document.querySelector("meta[name='csrf-token']")?.content || ""
+            },
+            body: JSON.stringify(result || {})
+          });
+        };
+
+        snap.pay(data.snap_token, {
+          onSuccess: async function(result) {
+            try {
+              await confirmPayment(data.booking_id, result);
+            } finally {
+              window.location.href = data.show_url;
+            }
+          },
+          onPending: async function(result) {
+            try {
+              await confirmPayment(data.booking_id, result);
+            } finally {
+              window.location.href = data.show_url;
+            }
+          },
+          onError: function() {
+            alert("Pembayaran gagal. Silakan coba lagi.");
+          },
+          onClose: function() {
+            window.location.href = data.show_url;
+          }
+        });
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        isSubmitting = false;
+        payButton.disabled = false;
+        payButton.textContent = "Lanjutkan Pembayaran";
+      }
+    });
+  };
+
+  document.addEventListener("turbo:load", initBooking, { once: true });
+  document.addEventListener("DOMContentLoaded", initBooking, { once: true });
 </script>

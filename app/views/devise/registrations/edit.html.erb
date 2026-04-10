@@ -1,47 +1,188 @@
-<h2>Edit <%= resource_name.to_s.humanize %></h2>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+<style>
+  body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
+  
+  .profile-card {
+    border: none;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    background: #fff;
+    overflow: hidden;
+  }
 
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+  .profile-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    padding: 3rem 2rem;
+    color: white;
+    text-align: center;
+  }
+
+  .form-label-custom {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-control-custom {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    transition: all 0.2s;
+  }
+
+  .form-control-custom:focus {
+    background-color: #fff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    outline: none;
+  }
+
+  .section-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 2rem 0;
+  }
+
+  .btn-update {
+    background: #3b82f6;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    color: white;
+    transition: all 0.2s;
+  }
+
+  .btn-update:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  }
+
+  .btn-cancel {
+    color: #ef4444;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+</style>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+      
+      <div class="mb-4">
+        <%= link_to :back, class: "text-decoration-none text-muted fw-bold small d-flex align-items-center" do %>
+          <i class="bi bi-chevron-left me-2"></i> KEMBALI
+        <% end %>
+      </div>
+
+      <div class="card profile-card">
+        <div class="profile-header">
+          <div class="mb-3">
+            <div class="bg-white bg-opacity-10 d-inline-flex p-3 rounded-circle border border-white border-opacity-20">
+              <i class="bi bi-person-gear text-white fs-1"></i>
+            </div>
+          </div>
+          <h2 class="fw-bold mb-1">Pengaturan Profil</h2>
+          <p class="text-white-50 mb-0 small">Perbarui informasi akun dan keamanan Anda</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+          <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+            
+            <%# Tampilkan error Devise jika ada %>
+            <% if resource.errors.any? %>
+              <div class="alert alert-danger rounded-4 mb-4 border-0 shadow-sm p-4">
+                <h6 class="fw-bold"><i class="bi bi-exclamation-triangle me-2"></i> Mohon perbaiki kesalahan berikut:</h6>
+                <ul class="mb-0 small opacity-75">
+                  <% resource.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label-custom">Email Address</label>
+                <%= f.email_field :email, class: "form-control form-control-custom w-100", autofocus: true, autocomplete: "email" %>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label-custom">Username</label>
+                <%= f.text_field :username, class: "form-control form-control-custom w-100", autocomplete: "username" %>
+              </div>
+              
+              <div class="col-md-6">
+                <label class="form-label-custom">No Telpon</label>
+                <%= f.telephone_field :no_telp, class: "form-control form-control-custom w-100", autocomplete: "tel" %>
+              </div>
+
+              <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+                <div class="col-12 mt-0">
+                  <div class="alert alert-info py-2 rounded-3 small border-0">
+                    <i class="bi bi-envelope me-2"></i> Menunggu konfirmasi untuk: <strong><%= resource.unconfirmed_email %></strong>
+                  </div>
+                </div>
+              <% end %>
+
+              <div class="section-divider"></div>
+
+              <div class="col-md-6">
+                <label class="form-label-custom">Password Baru <span class="text-lowercase fw-normal opacity-50">(kosongkan jika tidak ingin ganti)</span></label>
+                <%= f.password_field :password, class: "form-control form-control-custom w-100", autocomplete: "new-password" %>
+                <% if @minimum_password_length %>
+                  <div class="form-text small opacity-50"><i class="bi bi-info-circle me-1"></i>Min. <%= @minimum_password_length %> karakter</div>
+                <% end %>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label-custom">Konfirmasi Password</label>
+                <%= f.password_field :password_confirmation, class: "form-control form-control-custom w-100", autocomplete: "new-password" %>
+              </div>
+
+              <div class="section-divider"></div>
+
+              <div class="col-12 p-4 bg-light rounded-4 border border-light-subtle">
+                <div class="d-flex align-items-center mb-3">
+                  <i class="bi bi-shield-lock-fill text-primary fs-4 me-3"></i>
+                  <div>
+                    <label class="form-label-custom mb-0">Password Saat Ini</label>
+                    <p class="text-muted small mb-0">Dibutuhkan untuk mengonfirmasi perubahan profil</p>
+                  </div>
+                </div>
+                <%= f.password_field :current_password, class: "form-control form-control-custom w-100", autocomplete: "current-password", placeholder: "Masukkan password Anda sekarang" %>
+              </div>
+
+              <div class="col-12 text-end mt-5">
+                <%= f.submit "Simpan Perubahan", class: "btn-update" %>
+              </div>
+            </div>
+          <% end %>
+
+          <div class="section-divider my-5"></div>
+
+          <div class="p-4 border border-danger border-opacity-10 rounded-4 bg-danger bg-opacity-10">
+            <h6 class="fw-bold text-danger mb-2"><i class="bi bi-exclamation-octagon me-2"></i>Hapus Akun</h6>
+            <p class="small text-danger opacity-75 mb-3">Tindakan ini permanen. Semua data Anda akan dihapus selamanya.</p>
+            <%= button_to registration_path(resource_name), 
+                data: { confirm: "Anda yakin?", turbo_confirm: "Anda yakin?" }, 
+                method: :delete,
+                class: "btn btn-outline-danger btn-sm rounded-pill px-4 fw-bold" do %>
+              Hapus Akun Saya
+            <% end %>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
   </div>
-
-  <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-    <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
-  <% end %>
-
-  <div class="field">
-  <%= f.label :username %><br />
-  <%= f.text_field :username, autofocus: true, autocomplete: "username" %>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :password %> <i>(leave blank if you don't want to change it)</i></p>
-    <p><%= f.password_field :password, autocomplete: "new-password" %></p>
-    <% if @minimum_password_length %>
-      <p><em><%= @minimum_password_length %> characters minimum</em></p>
-    <% end %>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :password_confirmation %></p>
-    <p><%= f.password_field :password_confirmation, autocomplete: "new-password" %></p>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i></p>
-    <p><%= f.password_field :current_password, autocomplete: "current-password" %></p>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Update" %>
-  </div>
-<% end %>
-
-<h3>Cancel my account</h3>
-
-<div>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete %></div>
-
-<%= link_to "Back", :back %>
+</div>

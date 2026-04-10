@@ -1,59 +1,264 @@
 <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-4">
-  <div class="col">
-    <div class="card overflow-hidden radius-10">
-      <div class="card-body">
-        <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
-          <div class="w-50">
-            <p>Total pengguna</p>
-            <h4 class="text-info"><%= @users %></h4>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+              <div class="col">
+                <div class="card overflow-hidden radius-10 shadow">
+                  <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                      <p class="mb-4 text-muted">Total Pengguna</p>
+                      <h4 class="text-info"><%= @users %></h4>
+                    </div>
+                    <div class="icon-badge bg-info text-white">
+                      <i class="bi bi-people-fill"></i>
+                    </div>
+                  </div>
+                </div>
+               </div>
+
+              <div class="col">
+                <div class="card overflow-hidden radius-10 shadow">
+                  <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                      <p class="mb-4 text-muted">Total Kamar</p>
+                      <h4 class="text-primary"><%= @rooms %></h4>
+                    </div>
+                    <div class="icon-badge bg-info text-white">
+                      <i class="bi bi-door-closed-fill"></i>
+                    </div>
+                  </div>
+                </div>
+               </div>
 
   <div class="col">
-    <div class="card overflow-hidden radius-10">
-      <div class="card-body">
-        <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
-          <div class="w-50">
-            <p>Total Kamar</p>
-            <h4 class="text-primary"><%= @rooms %></h4>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+                <div class="card overflow-hidden radius-10 shadow">
+                  <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                      <p class="mb-4 text-muted">Total Admin</p>
+                      <h4 class="text-info"><%= @total_admin %></h4>
+                    </div>
+                    <div class="icon-badge bg-info text-white">
+                      <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                  </div>
+                </div>
+               </div>
 
   <div class="col">
-    <div class="card overflow-hidden radius-10">
-      <div class="card-body">
-        <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
-          <div class="w-50">
-            <p>Total admin</p>
-            <h4 class="text-info"><%= @total_admin %></h4>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+                <div class="card overflow-hidden radius-10 shadow">
+                  <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                      <p class="mb-4 text-muted">Total Booking</p>
+                      <h4 class="text-primary"><%= @bookings %></h4>
+                    </div>
+                    <div class="icon-badge bg-info text-white">
+                      <i class="bi bi-journal-check"></i>
+                    </div>
+                  </div>
+                </div>
+               </div>
+               </div>
 
-  <div class="col">
-    <div class="card overflow-hidden radius-10">
-      <div class="card-body">
-        <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
-          <div class="w-50">
-            <p>Total Booking</p>
-            <h4 class="text-primary"><%= @bookings %></h4>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+               <!-- START RIWAYAT BOOKING -->
+            <div class="card overflow-hidden radius-10 shadow">
+              <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <h5 class="fw-bold mb-0">Riwayat Booking</h5>
+                  <div class="d-flex align-items-center gap-2 w-50">
+
+                    <div class="search-wrapper">
+                    <select id="searchField" class="form-select w-auto">
+                      <option value="id">ID</option>
+                      <option value="username">Username</option>
+                      <option value="email">Email</option>
+                      <option value="status">Status</option>
+                    </select>
+                  </div>
+
+                    <input type="text" id="searchInput" class="form-control" placeholder="Ketik pencarian...">
+
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle custom-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>No Telpon</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Status</th>
+                        <th>Tanggal Pemesanan</th>
+                        <th class="text-center">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% @booking_histories.each do |booking| %>
+                        <tr>
+                          <td data-field="id">#<%= booking.id %></td>
+                          <td data-field="username"><%= booking.user&.username.presence || "-" %></td>
+                          <td data-field="email"><%= booking.user&.email %></td>
+                          <td data-field="no_telp"><%= booking.user&.no_telp.presence || "-" %></td>
+                          <td><%= booking.check_in&.strftime("%d %b %Y") || "-" %></td>
+                          <td><%= booking.check_out&.strftime("%d %b %Y") || "-" %></td>
+                          <td data-field="status">
+                            <span class="badge <%= if booking.complete?
+                                                      "bg-success"
+                                                    elsif booking.checked_in?
+                                                      "bg-primary"
+                                                    elsif booking.expired?
+                                                      "bg-danger"
+                                                    else
+                                                      "bg-warning text-dark"
+                                                    end %>">
+                              <%= status_label(booking.status) %>
+                            </span>
+                            <% if booking.overdue_checkout? %>
+                              <span class="badge bg-danger ms-1">Telat</span>
+                            <% end %>
+                          </td>
+                          <td><%= booking.created_at&.strftime("%d %b %Y") || "-" %></td>
+                          <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                              <button
+                                type="button"
+                                class="btn btn-sm btn-outline-primary btn-edit-booking"
+                                data-update-url="<%= admin_booking_path(booking) %>"
+                                data-id="<%= booking.id %>"
+                                data-username="<%= booking.user&.username.to_s %>"
+                                data-email="<%= booking.user&.email.to_s %>"
+                                data-check-in="<%= booking.check_in&.to_s %>"
+                                data-check-out="<%= booking.check_out&.to_s %>"
+                                data-status="<%= booking.status %>">
+                                Edit
+                              </button>
+                              <%= link_to "Detail", admin_booking_path(booking), class: "btn btn-sm btn-primary" %>
+                              <%= button_to "Hapus",
+                                    admin_booking_path(booking),
+                                    method: :delete,
+                                    data: { turbo_confirm: "Yakin ingin menghapus booking ini?" },
+                                    class: "btn btn-sm btn-outline-danger" %>
+                            </div>
+                          </td>
+                        </tr>
+                      <% end %>
+
+                      <% if @booking_histories.empty? %>
+                        <tr>
+                          <td colspan="8" class="text-center text-muted">Belum ada riwayat booking.</td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="modal fade" id="editBookingModal" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Edit Booking</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <%= form_with url: "#", method: :patch, local: true, id: "editBookingForm" do %>
+                        <div class="modal-body">
+                          <div class="mb-2">
+                            <label class="form-label">ID Booking</label>
+                            <input type="text" class="form-control" id="editBookingId" readonly>
+                          </div>
+                          <div class="mb-2">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" id="editBookingUsername" readonly>
+                          </div>
+                          <div class="mb-2">
+                            <label class="form-label">Email</label>
+                            <input type="text" class="form-control" id="editBookingEmail" readonly>
+                          </div>
+                          <div class="mb-2">
+                            <label class="form-label">Check-in</label>
+                            <input type="date" class="form-control" name="booking[check_in]" id="editBookingCheckIn" required>
+                          </div>
+                          <div class="mb-2">
+                            <label class="form-label">Check-out</label>
+                            <input type="date" class="form-control" name="booking[check_out]" id="editBookingCheckOut" required>
+                          </div>
+                          <div class="mb-2">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="booking[status]" id="editBookingStatus" required>
+                              <option value="paid">paid</option>
+                              <option value="checked_in">Checked in</option>
+                              <option value="complete">complete</option>
+                              <option value="expired">expired</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                          <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <!-- END RIWAYAT BOOKING -->
 
 
 <script src="/assets/plugins/chartjs/js/Chart.min.js"></script>
 <script src="/assets/plugins/chartjs/js/Chart.extension.js"></script>
 <script src="/assets/plugins/apexcharts-bundle/js/apexcharts.min.js"></script>
 <script src="/assets/js/dashboard.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("searchInput");
+    const searchField = document.getElementById("searchField");
+    if (!searchInput || !searchField) return;
+
+    const rows = document.querySelectorAll(".custom-table tbody tr");
+
+    function filterRows() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      const field = searchField.value;
+
+      rows.forEach((row) => {
+        const cell = row.querySelector(`[data-field="${field}"]`);
+        if (!cell) return;
+        const value = cell.textContent.toLowerCase();
+        row.style.display = value.includes(keyword) ? "" : "none";
+      });
+    }
+
+    searchInput.addEventListener("input", filterRows);
+    searchField.addEventListener("change", filterRows);
+
+    const editModalElement = document.getElementById("editBookingModal");
+    const editBookingForm = document.getElementById("editBookingForm");
+    const editBookingId = document.getElementById("editBookingId");
+    const editBookingUsername = document.getElementById("editBookingUsername");
+    const editBookingEmail = document.getElementById("editBookingEmail");
+    const editBookingCheckIn = document.getElementById("editBookingCheckIn");
+    const editBookingCheckOut = document.getElementById("editBookingCheckOut");
+    const editBookingStatus = document.getElementById("editBookingStatus");
+
+    if (!editModalElement || !editBookingForm) return;
+
+    const bookingModal = window.bootstrap ? bootstrap.Modal.getOrCreateInstance(editModalElement) : null;
+    const editButtons = document.querySelectorAll(".btn-edit-booking");
+
+    editButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        editBookingForm.action = this.dataset.updateUrl;
+        editBookingId.value = this.dataset.id || "-";
+        editBookingUsername.value = this.dataset.username || "-";
+        editBookingEmail.value = this.dataset.email || "-";
+        editBookingCheckIn.value = this.dataset.checkIn || "";
+        editBookingCheckOut.value = this.dataset.checkOut || "";
+        editBookingStatus.value = this.dataset.status || "paid";
+
+        if (bookingModal) bookingModal.show();
+      });
+    });
+  });
+</script>

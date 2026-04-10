@@ -23,7 +23,8 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+ <body data-turbo="false">
     <%= yield %>
+    <%= yield :scripts %>
   </body>
 </html>

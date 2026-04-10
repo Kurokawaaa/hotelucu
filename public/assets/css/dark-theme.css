@@ -11,6 +11,10 @@ html.dark-theme ::placeholder {
     opacity: 0.4 !important;
 }
 
+html.dark-theme p {
+    color: #aeb3c5 !important;
+}
+
 html.dark-theme .h1, html.dark-theme .h2, html.dark-theme .h3, html.dark-theme .h4, html.dark-theme .h5, html.dark-theme .h6, html.dark-theme h1, html.dark-theme h2, html.dark-theme h3, html.dark-theme h4, html.dark-theme h5, html.dark-theme h6 {
     color: #e4e5e6;
 }
@@ -68,10 +72,6 @@ html.dark-theme .sidebar-wrapper .metismenu a {
 
 html.dark-theme .sidebar-wrapper .metismenu ul {
     border: 1px solid #ffffff00;
-}
-
-html.dark-theme .sidebar-wrapper .sidebar-header img {
-    filter: invert(1) grayscale(100%) brightness(200%);
 }
 
 html.dark-theme .sidebar-wrapper .simplebar-scrollbar:before {
@@ -356,6 +356,50 @@ html.dark-theme .card-footer {
 
     background-color: #161d2d;
 
+}
+
+html.dark-theme .search-wrapper select {
+
+    color: #fcfcfc;
+    background-color: #1a2232;
+    border: 1px solid rgb(255 255 255 / 12%);
+
+}
+
+html.dark-theme .search-wrapper select option {
+
+    background-color: #1a2232;
+    color: #fcfcfc;
+
+}
+
+html.dark-theme .search-wrapper select option:hover {
+
+    background-color: #202a40;
+    color: #fcfcfc;
+
+}
+
+html.dark-theme .search-wrapper .form-select {
+    
+    color: #ffffff !important;
+    background-color: #1a2232 !important;
+    border: 1px solid rgb(255 255 255 / 12%);
+}
+
+html.dark-theme .form-control {
+    color: #ffffff;
+    background-color: #1a2232 !important;
+}
+
+html.dark-theme .table-responsive thead tr th {
+    color: #ffffff !important;
+    background-color: #202a40 !important;
+}
+
+html.dark-theme .table-responsive tbody tr td {
+    color: #ffffff !important;
+    background-color: #202a40 !important;
 }
 
 html.dark-theme .bg-dark{

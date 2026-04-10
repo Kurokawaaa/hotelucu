@@ -4,20 +4,29 @@ Rails.application.routes.draw do
   devise_for :users
 
   # ================= USER =================
-  root "home#index"  
-  get "/home", to: "home#home"  # <-- USER ke /
+  root "home#index"
+  get "/home", to: "home#home"
 
-  resources :bookings, path: "booking"
+  resources :bookings, path: "booking" do
+    post :snap_token, on: :member
+    post :confirm_payment, on: :member
+  end
+
+  post "/midtrans/notification", to: "midtrans#notification"
 
   # ================= ADMIN =================
   namespace :admin do
-    root "dashboard#index"          # /admin
+    root "dashboard#index"
     get "dashboard", to: "dashboard#index"
 
     resources :room_levels
     resources :facilities
     resources :rooms
-    resources :bookings, only: [:index, :show] do
+    resources :bookings, only: [:index, :show, :update, :destroy] do
+      get :new_reservation, on: :collection
+      post :create_reservation, on: :collection
+      patch :checkout, on: :member
+      get :history, on: :collection
       patch :validate, on: :member
     end
   end

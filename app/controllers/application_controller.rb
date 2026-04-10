@@ -1,10 +1,10 @@
 class ApplicationController < ActionController::Base
-  # TAMBAHKAN BARIS INI:
   before_action :configure_permitted_parameters, if: :devise_controller?
+  before_action :sync_room_statuses
 
   def after_sign_in_path_for(resource)
-    if resource.admin?
-      admin_root_path
+    if resource.admin_panel?
+      resource.resepsionis? ? admin_bookings_path : admin_root_path
     else
       home_path
     end
@@ -14,12 +14,14 @@ class ApplicationController < ActionController::Base
     new_user_session_path
   end
 
-  protected # Sebaiknya diletakkan di bawah protected agar lebih rapi
+  protected
 
   def configure_permitted_parameters
-    # Untuk proses Sign Up
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:username])
-    # Untuk proses Update Akun
-    devise_parameter_sanitizer.permit(:account_update, keys: [:username])
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:username, :no_telp])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:username, :no_telp])
+  end
+
+  def sync_room_statuses
+    Booking.sync_room_statuses!
   end
 end

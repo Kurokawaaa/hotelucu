@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+const initFacilitiesPage = () => {
   const tierSelect = document.getElementById("tierSelect");
   if (!tierSelect) return;
 
@@ -26,4 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     });
   });
-});
+};
+
+document.addEventListener("turbo:load", initFacilitiesPage);
+document.addEventListener("DOMContentLoaded", initFacilitiesPage);
